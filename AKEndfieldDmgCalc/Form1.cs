@@ -98,7 +98,7 @@ public partial class DamageCalculatorForm : Form
 
     private void InitializeComponent()
     {
-        this.Text = "Arknights: Endfield Damage Calculator v2.0";
+        this.Text = "Arknights: Endfield Damage Calculator v1.0";
         this.Size = new Size(900, 850);
         this.StartPosition = FormStartPosition.CenterScreen;
         this.AutoScroll = true;
