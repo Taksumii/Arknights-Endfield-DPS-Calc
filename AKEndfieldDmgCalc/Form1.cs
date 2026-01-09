@@ -90,11 +90,12 @@ public partial class DamageCalculatorForm : Form
     private Button btnCalculate;
 
     // DPS Calculator Tab Controls
-    private NumericUpDown nudSeq1, nudSeq2, nudSeq3, nudSeq4;
+    private NumericUpDown nudSeq1, nudSeq2, nudSeq3, nudSeq4, nudSeq5;
     private NumericUpDown nudSeqTime, nudSkillDamageBonus, nudSkillUptime;
     private NumericUpDown nudUltDamageBonus, nudUltUptime;
     private TextBox txtBaseDPS, txtWithSkillDPS, txtWithUltDPS, txtCombinedDPS, txtDPSBreakdown;
     private TextBox txtMinDPS, txtMaxDPS, txtAvgDPSRange;
+    private CheckBox chkUse5Hits;
     private Button btnCalculateDPS;
 
     // Build Manager Tab Controls
@@ -121,7 +122,7 @@ public partial class DamageCalculatorForm : Form
         this.Size = new Size(950, 800);
         this.StartPosition = FormStartPosition.CenterScreen;
 
-        
+        // Create TabControl
         tabControl = new TabControl
         {
             Location = new Point(10, 10),
@@ -149,7 +150,7 @@ public partial class DamageCalculatorForm : Form
         tab.AutoScroll = true;
         int leftCol = 20, rightCol = 450, yPos = 20;
 
-        // Quick Build Selector at top
+        // Quick Build Selector
         AddLabel(tab, "Quick Load Build:", leftCol, yPos);
         cmbBuildProfiles = new ComboBox
         {
@@ -287,7 +288,7 @@ public partial class DamageCalculatorForm : Form
         btnCalculate.Click += BtnCalculate_Click;
         tab.Controls.Add(btnCalculate);
 
-        // Results 
+        // Results
         int resultsY = buttonY;
         AddLabel(tab, "=== RESULTS ===", rightCol, resultsY, true);
         resultsY += 35;
@@ -296,7 +297,7 @@ public partial class DamageCalculatorForm : Form
         txtBaseDamage = AddResult(tab, "Base Damage:", rightCol, ref resultsY, 180);
         txtFinalDamage = AddResult(tab, "Final Damage:", rightCol, ref resultsY, 180);
 
-        // Damage Range section 
+        // Damage Range section
         int rangeY = buttonY + 50;
         AddLabel(tab, "=== DAMAGE RANGE ===", leftCol, rangeY, true);
         rangeY += 30;
@@ -375,6 +376,19 @@ public partial class DamageCalculatorForm : Form
         AddLabel(tab, "=== BASIC ATTACK SEQUENCE ===", leftCol, yPos, true);
         yPos += 35;
 
+        // Toggle for 5-hit combo
+        chkUse5Hits = new CheckBox
+        {
+            Text = "Enable 5-Hit Combo (some operators)",
+            Location = new Point(leftCol, yPos),
+            Width = 300,
+            Font = new Font("Arial", 9, FontStyle.Bold),
+            Checked = false
+        };
+        chkUse5Hits.CheckedChanged += ChkUse5Hits_CheckedChanged;
+        tab.Controls.Add(chkUse5Hits);
+        yPos += 30;
+
         AddLabel(tab, "Enter damage multipliers for each hit in sequence:", leftCol, yPos);
         yPos += 30;
 
@@ -391,7 +405,7 @@ public partial class DamageCalculatorForm : Form
         };
         tab.Controls.Add(nudSeq1);
         AddLabel(tab, "%", seqX + 135, yPos);
-        seqX += 180;
+        seqX += 160;
 
         AddLabel(tab, "Hit 2:", seqX, yPos);
         nudSeq2 = new NumericUpDown
@@ -405,7 +419,7 @@ public partial class DamageCalculatorForm : Form
         };
         tab.Controls.Add(nudSeq2);
         AddLabel(tab, "%", seqX + 135, yPos);
-        seqX += 180;
+        seqX += 160;
 
         AddLabel(tab, "Hit 3:", seqX, yPos);
         nudSeq3 = new NumericUpDown
@@ -419,7 +433,7 @@ public partial class DamageCalculatorForm : Form
         };
         tab.Controls.Add(nudSeq3);
         AddLabel(tab, "%", seqX + 135, yPos);
-        seqX += 180;
+        seqX += 160;
 
         AddLabel(tab, "Hit 4:", seqX, yPos);
         nudSeq4 = new NumericUpDown
@@ -432,6 +446,21 @@ public partial class DamageCalculatorForm : Form
             Font = new Font("Arial", 9)
         };
         tab.Controls.Add(nudSeq4);
+        AddLabel(tab, "%", seqX + 135, yPos);
+        seqX += 160;
+
+        AddLabel(tab, "Hit 5:", seqX, yPos);
+        nudSeq5 = new NumericUpDown
+        {
+            Location = new Point(seqX + 50, yPos - 3),
+            Width = 80,
+            Maximum = 10000,
+            DecimalPlaces = 1,
+            Value = 119,
+            Font = new Font("Arial", 9),
+            Enabled = false
+        };
+        tab.Controls.Add(nudSeq5);
         AddLabel(tab, "%", seqX + 135, yPos);
 
         yPos += 40;
@@ -493,6 +522,22 @@ public partial class DamageCalculatorForm : Form
             Font = new Font("Consolas", 9)
         };
         tab.Controls.Add(txtDPSBreakdown);
+    }
+
+    private void ChkUse5Hits_CheckedChanged(object sender, EventArgs e)
+    {
+        if (nudSeq5 != null)
+        {
+            nudSeq5.Enabled = chkUse5Hits.Checked;
+            if (!chkUse5Hits.Checked)
+            {
+                nudSeq5.Value = 0; // Reset to 0 when disabled
+            }
+            else
+            {
+                nudSeq5.Value = 119; 
+            }
+        }
     }
 
     private void InitializeBuildTab(TabPage tab)
@@ -652,7 +697,7 @@ public partial class DamageCalculatorForm : Form
             double critRate = (double)nudCritRate.Value / 100.0;
             double avgDamage = (minDamage * (1 - critRate)) + (maxDamage * critRate);
 
-            // Current damage 
+            // Current damage
             double preDmg = baseDmg * anomMult * actualCritZone * dmgBonus * dmgRedZone *
                            vulnZone * ampZone * sanctZone * fragZone * unbalZone *
                            specZone * spellLvlZone * stoneZone;
@@ -728,8 +773,17 @@ public partial class DamageCalculatorForm : Form
                 return;
             }
 
-            // Calculate sequence total multiplier (4 hits)
-            double seqTotal = (double)(nudSeq1.Value + nudSeq2.Value + nudSeq3.Value + nudSeq4.Value) / 100.0;
+            // Calculate sequence total multiplier (4 or 5 hits based on toggle)
+            double seqTotal = (double)(nudSeq1.Value + nudSeq2.Value + nudSeq3.Value + nudSeq4.Value);
+            string hitSequence = $"{nudSeq1.Value}% + {nudSeq2.Value}% + {nudSeq3.Value}% + {nudSeq4.Value}%";
+
+            if (chkUse5Hits.Checked && nudSeq5.Enabled)
+            {
+                seqTotal += (double)nudSeq5.Value;
+                hitSequence += $" + {nudSeq5.Value}%";
+            }
+
+            seqTotal /= 100.0;
             double seqTime = (double)nudSeqTime.Value;
             double dmgMultiplier = (double)nudDamageMultiplier.Value / 100.0;
 
@@ -752,7 +806,7 @@ public partial class DamageCalculatorForm : Form
             double maxDpsWithSkill = maxBaseDPS * avgSkillBonus;
             double avgDpsWithSkill = avgBaseDPS * avgSkillBonus;
 
-            // With Ultimate 
+            // With Ultimate
             double ultBonus = (double)nudUltDamageBonus.Value / 100.0;
             double ultUptime = (double)nudUltUptime.Value / 100.0;
             double avgUltBonus = 1.0 + (ultBonus * ultUptime);
@@ -779,8 +833,8 @@ public partial class DamageCalculatorForm : Form
 
             txtDPSBreakdown.Text = $@"=== DPS BREAKDOWN ===
 
-            Basic Attack Sequence:
-              Hits: {nudSeq1.Value}% + {nudSeq2.Value}% + {nudSeq3.Value}% + {nudSeq4.Value}%
+            Basic Attack Sequence ({(chkUse5Hits.Checked ? "5-hit" : "4-hit")} combo):
+              Hits: {hitSequence}
               Total: {seqTotal * 100:F1}% over {seqTime} seconds
               
             Damage per Sequence:
@@ -1120,4 +1174,5 @@ public partial class DamageCalculatorForm : Form
         Application.SetCompatibleTextRenderingDefault(false);
         Application.Run(new DamageCalculatorForm());
     }
+
 }
