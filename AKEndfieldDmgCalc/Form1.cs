@@ -5,6 +5,7 @@ using System.IO;
 using System.Text.Json;
 using System.Linq;
 
+/*
 public class BuildProfile
 {
     public string Name { get; set; }
@@ -1176,3 +1177,5 @@ public partial class DamageCalculatorForm : Form
     }
 
 }
+
+*/
