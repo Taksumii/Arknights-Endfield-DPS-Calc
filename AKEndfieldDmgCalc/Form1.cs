@@ -458,8 +458,8 @@ public partial class DamageCalculatorForm : Form
     }
 
 
-
-private void LoadBuildsList()
+    // build management
+    private void LoadBuildsList()
     {
         try
         {
@@ -568,7 +568,7 @@ private void BtnNew_Click(object sender, EventArgs e)
         {
             cmbBuildProfiles.Items.Insert(1, name);
             cmbBuildProfiles.SelectedIndex = 1;
-            BtnSave_Click(sender, e);
+           BtnSave_Click(sender, e);
         }
     }
 
