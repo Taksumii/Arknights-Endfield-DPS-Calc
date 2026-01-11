@@ -14,7 +14,7 @@ namespace EndfieldCalculator
             tab.AutoScroll = true;
             int leftCol = 30, rightCol = 500, yPos = 30;
 
-            // === GEAR SET SECTION ===
+            
             AddLabel(tab, "=== GEAR SET (3-Piece Bonus) ===", leftCol, yPos, true);
             yPos += 35;
 
@@ -105,21 +105,6 @@ namespace EndfieldCalculator
             pnlStandaloneInfo.Controls.Add(lblStandaloneInfo);
             tab.Controls.Add(pnlStandaloneInfo);
             yPos += 170;
-
-            // === WEAPON SECTION (PLACEHOLDER) ===
-            yPos += 20;
-            AddLabel(tab, "=== WEAPON (Coming Soon) ===", leftCol, yPos, true);
-            yPos += 35;
-
-            var lblWeaponPlaceholder = new Label
-            {
-                Location = new Point(leftCol, yPos),
-                Size = new Size(430, 60),
-                Font = new Font("Arial", 9, FontStyle.Italic),
-                ForeColor = Color.Gray,
-                Text = "Weapon selection will be added here in a future update.\n\nFor now, enter weapon stats manually in the Damage Calculator tab."
-            };
-            tab.Controls.Add(lblWeaponPlaceholder);
 
             // === COMBINED BONUSES DISPLAY (RIGHT SIDE) ===
             yPos = 30;
@@ -227,7 +212,7 @@ namespace EndfieldCalculator
 
             display += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
 
-            // Show what's equipped
+            
             display += "【 EQUIPPED 】\n";
             if (selectedGearSet != null)
                 display += $"  Set: {selectedGearSet.Name}\n";
@@ -256,7 +241,7 @@ namespace EndfieldCalculator
             info += $"Pieces: {set.PieceCount}\n\n";
             info += $"{set.Description}\n\n";
 
-            // Show what bonuses will be applied
+            
             info += "Set Bonuses:\n";
             var hasBonuses = false;
 

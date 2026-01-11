@@ -1,13 +1,10 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using AKEndfieldDmgCalc.Data;
+using System;
 using System.Drawing;
 using System.IO;
-using System.Text.Json;
 using System.Linq;
-using AKEndfieldDmgCalc.Models;      
-using AKEndfieldDmgCalc.Helpers;
-using AKEndfieldDmgCalc.Calculators;
-using AKEndfieldDmgCalc.Data;        
+using System.Text.Json;
+using System.Windows.Forms;
 
 namespace EndfieldCalculator
 {
@@ -86,18 +83,21 @@ namespace EndfieldCalculator
             var tabDamage = new TabPage("Damage Calculator");
             var tabDPS = new TabPage("DPS Calculator");
             var tabGear = new TabPage("Gear & Weapons");
+            var tabComparison = new TabPage("Comparison");
             var tabBuilds = new TabPage("Build Manager");
 
             tabControl.TabPages.Add(tabDamage);
             tabControl.TabPages.Add(tabDPS);
             tabControl.TabPages.Add(tabGear);
+            tabControl.TabPages.Add(tabComparison);
             tabControl.TabPages.Add(tabBuilds);
 
             InitializeDamageTab(tabDamage);
             InitializeDPSTab(tabDPS);
             InitializeGearTab(tabGear);
+            InitializeComparisonTab(tabComparison);
             InitializeBuildTab(tabBuilds);
         }
-
+     
     }
 }
