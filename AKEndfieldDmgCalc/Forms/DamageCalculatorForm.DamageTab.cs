@@ -2,12 +2,15 @@
 using System.Windows.Forms;
 using System.Drawing;
 using AKEndfieldDmgCalc.Calculators;
+using AKEndfieldDmgCalc.Data;
+using AKEndfieldDmgCalc.Helpers;
+
 
 namespace EndfieldCalculator
 {
-   
+
     /// Damage Calculator Tab initialization and logic
-    
+
     public partial class DamageCalculatorForm
     {
         private void InitializeDamageTab(TabPage tab)
@@ -24,7 +27,8 @@ namespace EndfieldCalculator
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Font = new Font("Arial", 9)
             };
-            cmbBuildProfiles.SelectedIndexChanged += (s, e) => {
+            cmbBuildProfiles.SelectedIndexChanged += (s, e) =>
+            {
                 if (cmbBuildProfiles.SelectedIndex > 0)
                 {
                     QuickLoadBuild();
@@ -57,6 +61,8 @@ namespace EndfieldCalculator
             nudSkillBonus = AddNumeric(tab, "Skill Bonus %:", leftCol, ref yPos, 0, 500, 0, true);
             nudUnbalanceBonus = AddNumeric(tab, "Unbalance Bonus %:", leftCol, ref yPos, 0, 500, 0, true);
             nudOtherBonus = AddNumeric(tab, "Other Bonus %:", leftCol, ref yPos, 0, 500, 0, true);
+            
+
 
             // Target Stats
             yPos = 60;
@@ -191,28 +197,43 @@ namespace EndfieldCalculator
         {
             try
             {
+                
+                var gearBonuses = CalculateGearBonuses();
+
                 var result = DamageCalculator.Calculate(
-                    // Attacker Stats
-                    (double)nudBaseAttack.Value, (double)nudWeaponAttack.Value,
-                    (double)nudAttackPercent.Value, (double)nudAttackFlat.Value,
-                    (double)nudPrimaryStat.Value, (double)nudSecondaryStat.Value,
+                    // Attacker Stats (with gear bonuses applied)
+                    (double)nudBaseAttack.Value,
+                    (double)nudWeaponAttack.Value,
+                    (double)nudAttackPercent.Value + gearBonuses.AttackPercent,  
+                    (double)nudAttackFlat.Value + gearBonuses.AttackFlat,      
+                    (double)nudPrimaryStat.Value,
+                    (double)nudSecondaryStat.Value,
                     (double)nudDamageMultiplier.Value,
-                    (double)nudCritRate.Value, (double)nudCritDamage.Value,
-                    (double)nudLevel.Value, (double)nudSourceStoneArtistry.Value,
-                    // Bonuses
-                    (double)nudElementalBonus.Value, (double)nudSkillBonus.Value,
-                    (double)nudUnbalanceBonus.Value, (double)nudOtherBonus.Value,
+                    (double)nudCritRate.Value + gearBonuses.CritRate,            
+                    (double)nudCritDamage.Value + gearBonuses.CritDamage,        
+                    (double)nudLevel.Value,
+                    (double)nudSourceStoneArtistry.Value,
+                    // Bonuses (with gear bonuses applied)
+                    (double)nudElementalBonus.Value + gearBonuses.ElementalDamageBonus, 
+                    (double)nudSkillBonus.Value + gearBonuses.SkillDamageBonus + gearBonuses.AllDamageBonus,  
+                    (double)nudUnbalanceBonus.Value,
+                    (double)nudOtherBonus.Value,
                     // Target
-                    (double)nudTargetDefense.Value, (double)nudTargetResistance.Value,
-                    chkIsUnbalanced.Checked, chkIsTrueDamage.Checked,
+                    (double)nudTargetDefense.Value,
+                    (double)nudTargetResistance.Value,
+                    chkIsUnbalanced.Checked,
+                    chkIsTrueDamage.Checked,
                     // Anomaly
                     cmbAnomalyType.SelectedItem?.ToString() ?? "None",
                     (int)nudAnomalyLevel.Value,
                     // Multipliers
-                    (double)nudVulnerability.Value, (double)nudAmplification.Value,
-                    (double)nudSanctuary.Value, (double)nudFragility.Value,
-                    (double)nudDamageReduction.Value, (double)nudSpecialMultiplier.Value,
-                    // Flags
+                    (double)nudVulnerability.Value,
+                    (double)nudAmplification.Value,
+                    (double)nudSanctuary.Value,
+                    (double)nudFragility.Value,
+                    (double)nudDamageReduction.Value + gearBonuses.DamageReduction,  
+                    (double)nudSpecialMultiplier.Value,
+                    
                     chkIsCritical.Checked
                 );
 
@@ -225,9 +246,25 @@ namespace EndfieldCalculator
                 if (txtMinDamage != null) txtMinDamage.Text = Math.Floor(result.MinDamage).ToString("F0");
                 if (txtMaxDamage != null) txtMaxDamage.Text = Math.Floor(result.MaxDamage).ToString("F0");
                 if (txtAvgDamage != null) txtAvgDamage.Text = Math.Floor(result.AverageDamage).ToString("F0");
-                if (txtCritChance != null) txtCritChance.Text = $"{nudCritRate.Value}%";
+                if (txtCritChance != null) txtCritChance.Text = $"{nudCritRate.Value + (decimal)gearBonuses.CritRate}%";
 
-                txtBreakdown.Text = result.Breakdown;
+                // Enhanced breakdown showing gear bonuses
+                string gearInfo = "";
+                if (gearBonuses.AttackPercent > 0 || gearBonuses.AttackFlat > 0 ||
+                    gearBonuses.ElementalDamageBonus > 0 || gearBonuses.SkillDamageBonus > 0)
+                {
+                    gearInfo = "\nGear Bonuses Applied:\n";
+                    if (gearBonuses.AttackFlat > 0) gearInfo += $"  +{gearBonuses.AttackFlat} Flat ATK\n";
+                    if (gearBonuses.AttackPercent > 0) gearInfo += $"  +{gearBonuses.AttackPercent}% ATK\n";
+                    if (gearBonuses.CritRate > 0) gearInfo += $"  +{gearBonuses.CritRate}% Crit Rate\n";
+                    if (gearBonuses.CritDamage > 0) gearInfo += $"  +{gearBonuses.CritDamage}% Crit Damage\n";
+                    if (gearBonuses.ElementalDamageBonus > 0) gearInfo += $"  +{gearBonuses.ElementalDamageBonus}% Elemental DMG\n";
+                    if (gearBonuses.SkillDamageBonus > 0) gearInfo += $"  +{gearBonuses.SkillDamageBonus}% Skill DMG\n";
+                    if (gearBonuses.AllDamageBonus > 0) gearInfo += $"  +{gearBonuses.AllDamageBonus}% All DMG\n";
+                    if (gearBonuses.DamageReduction > 0) gearInfo += $"  +{gearBonuses.DamageReduction}% DMG Reduction\n";
+                }
+
+                txtBreakdown.Text = gearInfo + "\n" + result.Breakdown;
             }
             catch (Exception ex)
             {

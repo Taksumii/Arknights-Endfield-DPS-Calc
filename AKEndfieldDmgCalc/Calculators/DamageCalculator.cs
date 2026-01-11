@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AKEndfieldDmgCalc.Calculators
+namespace EndfieldCalculator
 {
     
     /// Contains all damage calculation formulas

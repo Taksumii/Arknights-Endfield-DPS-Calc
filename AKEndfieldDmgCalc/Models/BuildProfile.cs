@@ -18,6 +18,7 @@
         public decimal CritDamage { get; set; }
         public decimal Level { get; set; }
         public decimal SourceStoneArtistry { get; set; }
+        public string GearSetName { get; set; }
 
         // Damage Bonuses
         public decimal ElementalBonus { get; set; }

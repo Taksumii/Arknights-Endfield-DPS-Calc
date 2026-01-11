@@ -4,10 +4,10 @@ using System.Drawing;
 using System.IO;
 using System.Text.Json;
 using System.Linq;
+using AKEndfieldDmgCalc.Models;      
 using AKEndfieldDmgCalc.Helpers;
 using AKEndfieldDmgCalc.Calculators;
-using AKEndfieldDmgCalc.Models;
-
+using AKEndfieldDmgCalc.Data;        
 
 namespace EndfieldCalculator
 {
@@ -46,6 +46,17 @@ namespace EndfieldCalculator
         private Button btnExportBuild, btnImportBuild;
         private Label lblBuildInfo;
 
+        // Gear Tab Controls
+        private ComboBox cmbGearSet;
+        private ComboBox cmbStandaloneItem;
+        private Label lblGearSetInfo;
+        private Label lblStandaloneInfo;
+        private Panel pnlGearInfo;
+
+        // Gear system - store selected items
+        private GearSet selectedGearSet = null;
+        private StandaloneItem selectedStandaloneItem = null;
+
         private string buildsDirectory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             "EndfieldCalculator", "Builds");
@@ -58,7 +69,7 @@ namespace EndfieldCalculator
 
         private void InitializeComponent()
         {
-            this.Text = "Arknights: Endfield Damage Calculator v3.1";
+            this.Text = "Arknights: Endfield Damage Calculator v1.2";
             this.Size = new Size(950, 800);
             this.StartPosition = FormStartPosition.CenterScreen;
 
@@ -74,18 +85,19 @@ namespace EndfieldCalculator
             // Create Tabs
             var tabDamage = new TabPage("Damage Calculator");
             var tabDPS = new TabPage("DPS Calculator");
+            var tabGear = new TabPage("Gear & Weapons");
             var tabBuilds = new TabPage("Build Manager");
 
             tabControl.TabPages.Add(tabDamage);
             tabControl.TabPages.Add(tabDPS);
+            tabControl.TabPages.Add(tabGear);
             tabControl.TabPages.Add(tabBuilds);
 
             InitializeDamageTab(tabDamage);
             InitializeDPSTab(tabDPS);
+            InitializeGearTab(tabGear);
             InitializeBuildTab(tabBuilds);
         }
 
-    
-     
     }
 }

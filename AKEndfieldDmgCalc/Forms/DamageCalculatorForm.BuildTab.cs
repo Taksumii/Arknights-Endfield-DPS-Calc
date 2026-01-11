@@ -150,7 +150,8 @@ namespace EndfieldCalculator
                 Sanctuary = nudSanctuary.Value,
                 Fragility = nudFragility.Value,
                 DamageReduction = nudDamageReduction.Value,
-                SpecialMultiplier = nudSpecialMultiplier.Value
+                SpecialMultiplier = nudSpecialMultiplier.Value,
+                GearSetName = cmbGearSet?.SelectedItem?.ToString() ?? "None (No Set Bonus)"
             };
         }
 
@@ -174,6 +175,12 @@ namespace EndfieldCalculator
             nudOtherBonus.Value = p.OtherBonus;
             nudTargetDefense.Value = p.TargetDefense;
             nudTargetResistance.Value = p.TargetResistance;
+
+            if (cmbGearSet != null && !string.IsNullOrEmpty(p.GearSetName))
+            {
+                int gearIdx = cmbGearSet.Items.IndexOf(p.GearSetName);
+                if (gearIdx >= 0) cmbGearSet.SelectedIndex = gearIdx;
+            }
 
             int idx = cmbDamageType.Items.IndexOf(p.DamageType);
             cmbDamageType.SelectedIndex = idx >= 0 ? idx : 0;
