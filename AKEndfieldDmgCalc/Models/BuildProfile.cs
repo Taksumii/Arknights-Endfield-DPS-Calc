@@ -13,6 +13,11 @@
         public decimal AttackFlat { get; set; }
         public decimal PrimaryStat { get; set; }
         public decimal SecondaryStat { get; set; }
+
+        // Stat Types
+        public string PrimaryStatType { get; set; } = "STR";
+        public string SecondaryStatType { get; set; } = "STR";
+
         public decimal DamageMultiplier { get; set; }
         public decimal CritRate { get; set; }
         public decimal CritDamage { get; set; }

@@ -7,11 +7,15 @@ using AKEndfieldDmgCalc.Helpers;
 
 namespace EndfieldCalculator
 {
-  
+
     public partial class DamageCalculatorForm
     {
         private CollapsibleSectionManager sectionManagerLeft;
         private CollapsibleSectionManager sectionManagerRight;
+
+       
+        private ComboBox cmbPrimaryStatType;
+        private ComboBox cmbSecondaryStatType;
 
         private void InitializeDamageTab(TabPage tab)
         {
@@ -90,9 +94,14 @@ namespace EndfieldCalculator
                 CreateNumericWithLabel("Operator Base Attack:", leftCol + 10, ref innerY, 0, 10000, 100, out nudBaseAttack),
                 CreateNumericWithLabel("Weapon Base Attack:", leftCol + 10, ref innerY, 0, 10000, 50, out nudWeaponAttack),
                 CreateNumericWithLabel("Attack % Bonus:", leftCol + 10, ref innerY, 0, 500, 0, out nudAttackPercent, true),
-                CreateNumericWithLabel("Attack Flat Bonus:", leftCol + 10, ref innerY, 0, 5000, 0, out nudAttackFlat),
-                CreateNumericWithLabel("Primary Stat:", leftCol + 10, ref innerY, 0, 2000, 100, out nudPrimaryStat),
-                CreateNumericWithLabel("Secondary Stat:", leftCol + 10, ref innerY, 0, 2000, 50, out nudSecondaryStat),
+                CreateNumericWithLabel("Attack Flat Bonus:", leftCol + 10, ref innerY, 0, 5000, 0, out nudAttackFlat)
+            );
+
+            attackerSection.AddControl(CreateStatWithDropdown("Primary Stat:", leftCol + 10, ref innerY, 0, 2000, 100, out nudPrimaryStat, out cmbPrimaryStatType));
+
+            attackerSection.AddControl(CreateStatWithDropdown("Secondary Stat:", leftCol + 10, ref innerY, 0, 2000, 50, out nudSecondaryStat, out cmbSecondaryStatType));
+
+            attackerSection.AddControls(
                 CreateNumericWithLabel("Damage Multiplier %:", leftCol + 10, ref innerY, 0, 10000, 100, out nudDamageMultiplier, true),
                 CreateNumericWithLabel("Critical Rate %:", leftCol + 10, ref innerY, 0, 100, 5, out nudCritRate, true),
                 CreateNumericWithLabel("Critical Damage %:", leftCol + 10, ref innerY, 0, 500, 50, out nudCritDamage, true),
@@ -187,7 +196,7 @@ namespace EndfieldCalculator
             });
             cmbAnomalyType.SelectedIndex = 0;
             cmbAnomalyType.SelectedIndexChanged += (s, e) => {
-               
+
                 string anomType = cmbAnomalyType.SelectedItem?.ToString() ?? "None";
                 if (anomType != "None" && !anomType.Contains("Knock") &&
                     anomType != "Armor Shatter" && anomType != "Smash")
@@ -201,13 +210,13 @@ namespace EndfieldCalculator
 
             anomalySection.AddControl(CreateNumericWithLabel("Anomaly Level (1-4):", rightCol + 10, ref innerY, 1, 4, 1, out nudAnomalyLevel));
 
-            
+
             nudLevel = new NumericUpDown { Minimum = 1, Maximum = 99, Value = 99, Visible = false };
             anomalySection.AddControl(nudLevel);
 
             sectionManagerRight.AddSection(anomalySection);
 
-        
+
             var multipliersSection = new CollapsibleSection(tab, "MULTIPLIER ZONES", rightCol, anomalySection.GetBottom() + 10, 420, Color.FromArgb(255, 250, 230), () => RepositionButtonsAndResults(tab));
             innerY = 10;
 
@@ -221,8 +230,7 @@ namespace EndfieldCalculator
             );
             sectionManagerRight.AddSection(multipliersSection);
 
-            // === RESULTS AS COLLAPSIBLE SECTION ===
-            // Calculate initial position based on right column bottom
+          
             int resultsY = multipliersSection.GetBottom() + 20;
             var resultsSection = new CollapsibleSection(tab, "RESULTS", rightCol, resultsY, 420, Color.FromArgb(230, 255, 230));
             int resultInnerY = 10;
@@ -334,7 +342,7 @@ namespace EndfieldCalculator
 
             rangeSection.AddControl(pnlRange);
 
-         
+
             int initialBreakdownY = Math.Max(rangeSection.GetBottom(), resultsSection.GetBottom()) + 20;
             var lblBreakdown = new Label
             {
@@ -379,7 +387,7 @@ namespace EndfieldCalculator
             RepositionButtonsAndResults(tab);
         }
 
-      
+
         private void RepositionButtonsAndResults(TabPage tab)
         {
             var tag = tab.Tag as dynamic;
@@ -388,13 +396,13 @@ namespace EndfieldCalculator
             int leftColBottom = tag.bonusesSection.GetBottom();
             int rangeY = leftColBottom + 20;
 
-         
+
             int rightColBottom = tag.multipliersSection.GetBottom();
             int resultsY = rightColBottom + 20;
 
             tag.rangeSection.SetY(rangeY);
 
-       
+
             tag.resultsSection.SetY(resultsY);
 
             // Reposition breakdown
@@ -407,6 +415,48 @@ namespace EndfieldCalculator
         }
 
        
+        private Control CreateStatWithDropdown(string labelText, int x, ref int y, decimal min, decimal max, decimal val, out NumericUpDown nud, out ComboBox cmb)
+        {
+            var panel = new Panel { Location = new Point(0, y), Size = new Size(400, 35), BackColor = Color.Transparent };
+
+            var lbl = new Label
+            {
+                Text = labelText,
+                Location = new Point(0, 5),
+                AutoSize = true,
+                Font = new Font("Arial", 9)
+            };
+
+            nud = new NumericUpDown
+            {
+                Location = new Point(180, 0),
+                Width = 90,
+                Minimum = min,
+                Maximum = max,
+                Value = val,
+                DecimalPlaces = 0,
+                Font = new Font("Arial", 9)
+            };
+
+            cmb = new ComboBox
+            {
+                Location = new Point(280, 0),
+                Width = 60,
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Font = new Font("Arial", 9)
+            };
+            cmb.Items.AddRange(new object[] { "STR", "AGL", "INT", "WIL" });
+            cmb.SelectedIndex = 0; 
+
+            panel.Controls.Add(lbl);
+            panel.Controls.Add(nud);
+            panel.Controls.Add(cmb);
+            y += 35;
+
+            return panel;
+        }
+
+
         private Control CreateNumericWithLabel(string labelText, int x, ref int y, decimal min, decimal max, decimal val, out NumericUpDown nud, bool percent = false)
         {
             var panel = new Panel { Location = new Point(0, y), Size = new Size(400, 35), BackColor = Color.Transparent };
@@ -485,7 +535,7 @@ namespace EndfieldCalculator
                 if (txtAvgDamage != null) txtAvgDamage.Text = Math.Floor(result.AverageDamage).ToString("F0");
                 if (txtCritChance != null) txtCritChance.Text = $"{nudCritRate.Value + (decimal)gearBonuses.CritRate}%";
 
-                // Breakdown 
+                // Breakdown with stat type info
                 string gearInfo = "";
                 if (gearBonuses.AttackPercent > 0 || gearBonuses.AttackFlat > 0 ||
                     gearBonuses.ElementalDamageBonus > 0 || gearBonuses.SkillDamageBonus > 0)
@@ -501,7 +551,12 @@ namespace EndfieldCalculator
                     if (gearBonuses.DamageReduction > 0) gearInfo += $"  +{gearBonuses.DamageReduction}% DMG Reduction\n";
                 }
 
-                txtBreakdown.Text = gearInfo + "\n" + result.Breakdown;
+                // Add stat type info
+                string statInfo = $"\nStat Configuration:\n";
+                statInfo += $"  Primary: {nudPrimaryStat.Value} ({cmbPrimaryStatType.SelectedItem})\n";
+                statInfo += $"  Secondary: {nudSecondaryStat.Value} ({cmbSecondaryStatType.SelectedItem})\n";
+
+                txtBreakdown.Text = statInfo + gearInfo + "\n" + result.Breakdown;
             }
             catch (Exception ex)
             {

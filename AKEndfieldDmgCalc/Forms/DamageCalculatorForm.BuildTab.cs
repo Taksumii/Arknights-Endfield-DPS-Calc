@@ -10,9 +10,9 @@ using AKEndfieldDmgCalc.Calculators;
 
 namespace EndfieldCalculator
 {
+
     
-    /// Build Manager Tab initialization and logic
-    
+
     public partial class DamageCalculatorForm
     {
         private void InitializeBuildTab(TabPage tab)
@@ -128,6 +128,11 @@ namespace EndfieldCalculator
                 AttackFlat = nudAttackFlat.Value,
                 PrimaryStat = nudPrimaryStat.Value,
                 SecondaryStat = nudSecondaryStat.Value,
+
+                // Save stat types
+                PrimaryStatType = cmbPrimaryStatType?.SelectedItem?.ToString() ?? "STR",
+                SecondaryStatType = cmbSecondaryStatType?.SelectedItem?.ToString() ?? "STR",
+
                 DamageMultiplier = nudDamageMultiplier.Value,
                 CritRate = nudCritRate.Value,
                 CritDamage = nudCritDamage.Value,
@@ -164,6 +169,20 @@ namespace EndfieldCalculator
             nudAttackFlat.Value = p.AttackFlat;
             nudPrimaryStat.Value = p.PrimaryStat;
             nudSecondaryStat.Value = p.SecondaryStat;
+
+            // Load stat types
+            if (cmbPrimaryStatType != null && !string.IsNullOrEmpty(p.PrimaryStatType))
+            {
+                int idx = cmbPrimaryStatType.Items.IndexOf(p.PrimaryStatType);
+                if (idx >= 0) cmbPrimaryStatType.SelectedIndex = idx;
+            }
+
+            if (cmbSecondaryStatType != null && !string.IsNullOrEmpty(p.SecondaryStatType))
+            {
+                int idx = cmbSecondaryStatType.Items.IndexOf(p.SecondaryStatType);
+                if (idx >= 0) cmbSecondaryStatType.SelectedIndex = idx;
+            }
+
             nudDamageMultiplier.Value = p.DamageMultiplier;
             nudCritRate.Value = p.CritRate;
             nudCritDamage.Value = p.CritDamage;
@@ -182,15 +201,15 @@ namespace EndfieldCalculator
                 if (gearIdx >= 0) cmbGearSet.SelectedIndex = gearIdx;
             }
 
-            int idx = cmbDamageType.Items.IndexOf(p.DamageType);
-            cmbDamageType.SelectedIndex = idx >= 0 ? idx : 0;
+            int idx2 = cmbDamageType.Items.IndexOf(p.DamageType);
+            cmbDamageType.SelectedIndex = idx2 >= 0 ? idx2 : 0;
 
             chkIsUnbalanced.Checked = p.IsUnbalanced;
             chkIsCritical.Checked = p.IsCritical;
             chkIsTrueDamage.Checked = p.IsTrueDamage;
 
-            idx = cmbAnomalyType.Items.IndexOf(p.AnomalyType);
-            cmbAnomalyType.SelectedIndex = idx >= 0 ? idx : 0;
+            idx2 = cmbAnomalyType.Items.IndexOf(p.AnomalyType);
+            cmbAnomalyType.SelectedIndex = idx2 >= 0 ? idx2 : 0;
 
             nudAnomalyLevel.Value = p.AnomalyLevel;
             nudVulnerability.Value = p.Vulnerability;
@@ -224,7 +243,12 @@ namespace EndfieldCalculator
         {
             try
             {
-                if (lstBuilds.SelectedIndex < 0) return;
+                if (lstBuilds.SelectedIndex < 0)
+                {
+                    
+                    lstBuilds.Tag = null;
+                    return;
+                }
 
                 string name = lstBuilds.SelectedItem.ToString();
                 string path = Path.Combine(buildsDirectory, $"{name}.json");
@@ -235,8 +259,19 @@ namespace EndfieldCalculator
                     if (profile != null)
                     {
                         var fileInfo = new FileInfo(path);
-                        lblBuildInfo.Text = $"Build: {name}\nLast Modified: {fileInfo.LastWriteTime:g}\nSize: {fileInfo.Length} bytes";
+
+                        // Enhanced display with stat types
+                        string statInfo = "";
+                        if (!string.IsNullOrEmpty(profile.PrimaryStatType) || !string.IsNullOrEmpty(profile.SecondaryStatType))
+                        {
+                            statInfo = $"\nStats: {profile.PrimaryStat} {profile.PrimaryStatType ?? "STR"} / {profile.SecondaryStat} {profile.SecondaryStatType ?? "STR"}";
+                        }
+
+                        lblBuildInfo.Text = $"Build: {name}\nLast Modified: {fileInfo.LastWriteTime:g}\nSize: {fileInfo.Length} bytes{statInfo}";
                         txtBuildNotes.Text = profile.Notes ?? "";
+
+                        
+                        lstBuilds.Tag = null;
                     }
                 }
             }
@@ -248,8 +283,17 @@ namespace EndfieldCalculator
             string name = InputDialog.Show("Enter build name:", "New Build");
             if (!string.IsNullOrWhiteSpace(name))
             {
+                
+                lstBuilds.SelectedIndex = -1;
+
+             
                 txtBuildNotes.Text = "";
-                lblBuildInfo.Text = $"New Build: {name}\nNot yet saved.";
+
+                
+                lblBuildInfo.Text = $"New Build: {name}\nNot yet saved.\n\nClick 'Save' to create this build.";
+
+                
+                lstBuilds.Tag = name;
             }
         }
 
@@ -257,9 +301,24 @@ namespace EndfieldCalculator
         {
             try
             {
-                string name = lstBuilds.SelectedItem?.ToString();
+                string name = null;
+
+                
+                if (lstBuilds.Tag is string newBuildName && !string.IsNullOrWhiteSpace(newBuildName))
+                {
+                    name = newBuildName;
+                }
+         
+                else if (lstBuilds.SelectedIndex >= 0)
+                {
+                    name = lstBuilds.SelectedItem?.ToString();
+                }
+
+                
                 if (string.IsNullOrWhiteSpace(name))
+                {
                     name = InputDialog.Show("Enter build name:", "Save Build");
+                }
 
                 if (string.IsNullOrWhiteSpace(name)) return;
 
@@ -269,6 +328,9 @@ namespace EndfieldCalculator
                 string path = Path.Combine(buildsDirectory, $"{name}.json");
                 File.WriteAllText(path, JsonSerializer.Serialize(profile,
                     new JsonSerializerOptions { WriteIndented = true }));
+
+                // Clear the temporary new build name
+                lstBuilds.Tag = null;
 
                 MessageBox.Show($"Saved '{name}'!", "Success");
                 LoadBuildsList();
