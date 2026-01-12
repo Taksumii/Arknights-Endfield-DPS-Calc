@@ -1,6 +1,6 @@
 ﻿namespace AKEndfieldDmgCalc.Models
 {
-    /// Represents a saved build configuration for an operator 
+
     public class BuildProfile
     {
         public string Name { get; set; }
@@ -13,6 +13,8 @@
         public decimal AttackFlat { get; set; }
         public decimal PrimaryStat { get; set; }
         public decimal SecondaryStat { get; set; }
+        public string PrimaryStatType { get; set; }    // NEW: STR, AGL, INT, WLL
+        public string SecondaryStatType { get; set; }  // NEW: STR, AGL, INT, WLL
         public decimal DamageMultiplier { get; set; }
         public decimal CritRate { get; set; }
         public decimal CritDamage { get; set; }
