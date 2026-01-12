@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace AKEndfieldDmgCalc.Helpers
 {
-   
+  
     public class CollapsibleSection
     {
         private Panel headerPanel;
@@ -15,12 +15,15 @@ namespace AKEndfieldDmgCalc.Helpers
         private bool isExpanded = true;
         private int collapsedHeight = 35;
         private int expandedHeight;
+        private Action onToggleCallback;
 
         public Panel Panel { get; private set; }
         public bool IsExpanded => isExpanded;
 
-        public CollapsibleSection(Control parent, string title, int x, int y, int width, Color headerColor)
+        public CollapsibleSection(Control parent, string title, int x, int y, int width, Color headerColor, Action onToggle = null)
         {
+            onToggleCallback = onToggle;
+
          
             Panel = new Panel
             {
@@ -75,7 +78,6 @@ namespace AKEndfieldDmgCalc.Helpers
             Panel.Controls.Add(contentPanel);
             parent.Controls.Add(Panel);
 
-            // Start expanded
             isExpanded = true;
         }
 
@@ -106,9 +108,12 @@ namespace AKEndfieldDmgCalc.Helpers
             {
                 Collapse();
             }
+
+           
+            onToggleCallback?.Invoke();
         }
 
-   
+      
         public void Expand()
         {
             isExpanded = true;
@@ -134,7 +139,7 @@ namespace AKEndfieldDmgCalc.Helpers
                 return;
             }
 
-            
+         
             int maxBottom = 0;
             foreach (Control ctrl in contentPanel.Controls)
             {
@@ -153,7 +158,7 @@ namespace AKEndfieldDmgCalc.Helpers
             Panel.Location = new Point(Panel.Location.X, y);
         }
 
-      
+   
         public int GetBottom()
         {
             return Panel.Location.Y + Panel.Height;
@@ -172,7 +177,7 @@ namespace AKEndfieldDmgCalc.Helpers
             section.Panel.SizeChanged += (s, e) => RepositionSections();
         }
 
-    
+        
         public void RepositionSections()
         {
             if (sections.Count == 0) return;
@@ -186,7 +191,6 @@ namespace AKEndfieldDmgCalc.Helpers
             }
         }
 
-      
         public void ExpandAll()
         {
             foreach (var section in sections)
@@ -196,7 +200,7 @@ namespace AKEndfieldDmgCalc.Helpers
             RepositionSections();
         }
 
-        
+     
         public void CollapseAll()
         {
             foreach (var section in sections)
