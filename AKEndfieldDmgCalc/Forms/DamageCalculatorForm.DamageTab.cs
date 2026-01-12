@@ -4,7 +4,6 @@ using System.Drawing;
 using AKEndfieldDmgCalc.Calculators;
 using AKEndfieldDmgCalc.Data;
 using AKEndfieldDmgCalc.Helpers;
-using System.Net.Http.Headers;
 
 namespace EndfieldCalculator
 {
@@ -14,6 +13,7 @@ namespace EndfieldCalculator
         private CollapsibleSectionManager sectionManagerLeft;
         private CollapsibleSectionManager sectionManagerRight;
 
+       
         private ComboBox cmbPrimaryStatType;
         private ComboBox cmbSecondaryStatType;
 
@@ -83,9 +83,6 @@ namespace EndfieldCalculator
             tab.Controls.Add(btnCollapseAll);
 
             yPos += 40;
-
-            var quickCalcPanel = new AKEndfieldDmgCalc.Helpers.SimpleCalculatorPanel(620, 620);
-            tab.Controls.Add(quickCalcPanel);
 
             // === LEFT COLUMN ===
 
