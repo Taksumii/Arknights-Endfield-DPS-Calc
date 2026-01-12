@@ -82,9 +82,6 @@ namespace EndfieldCalculator
             };
             tab.Controls.Add(btnCollapseAll);
 
-            var quickCalc = new AKEndfieldDmgCalc.Helpers.SimpleCalculator(620, 620);
-            tab.Controls.Add(quickCalc);
-
             yPos += 40;
 
             // === LEFT COLUMN ===
