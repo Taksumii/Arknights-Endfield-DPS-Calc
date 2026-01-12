@@ -11,6 +11,8 @@ using AKEndfieldDmgCalc.Calculators;
 namespace EndfieldCalculator
 {
     
+    /// Build Manager Tab initialization and logic
+    
     public partial class DamageCalculatorForm
     {
         private void InitializeBuildTab(TabPage tab)
@@ -126,8 +128,6 @@ namespace EndfieldCalculator
                 AttackFlat = nudAttackFlat.Value,
                 PrimaryStat = nudPrimaryStat.Value,
                 SecondaryStat = nudSecondaryStat.Value,
-                PrimaryStatType = cmbPrimaryStat?.SelectedItem?.ToString() ?? "STR",      
-                SecondaryStatType = cmbSecondaryStat?.SelectedItem?.ToString() ?? "STR",  
                 DamageMultiplier = nudDamageMultiplier.Value,
                 CritRate = nudCritRate.Value,
                 CritDamage = nudCritDamage.Value,
@@ -164,19 +164,6 @@ namespace EndfieldCalculator
             nudAttackFlat.Value = p.AttackFlat;
             nudPrimaryStat.Value = p.PrimaryStat;
             nudSecondaryStat.Value = p.SecondaryStat;
-
-            
-            if (cmbPrimaryStat != null && !string.IsNullOrEmpty(p.PrimaryStatType))
-            {
-                int idx = cmbPrimaryStat.Items.IndexOf(p.PrimaryStatType);
-                if (idx >= 0) cmbPrimaryStat.SelectedIndex = idx;
-            }
-            if (cmbSecondaryStat != null && !string.IsNullOrEmpty(p.SecondaryStatType))
-            {
-                int idx = cmbSecondaryStat.Items.IndexOf(p.SecondaryStatType);
-                if (idx >= 0) cmbSecondaryStat.SelectedIndex = idx;
-            }
-
             nudDamageMultiplier.Value = p.DamageMultiplier;
             nudCritRate.Value = p.CritRate;
             nudCritDamage.Value = p.CritDamage;
@@ -195,15 +182,15 @@ namespace EndfieldCalculator
                 if (gearIdx >= 0) cmbGearSet.SelectedIndex = gearIdx;
             }
 
-            int idx2 = cmbDamageType.Items.IndexOf(p.DamageType);
-            cmbDamageType.SelectedIndex = idx2 >= 0 ? idx2 : 0;
+            int idx = cmbDamageType.Items.IndexOf(p.DamageType);
+            cmbDamageType.SelectedIndex = idx >= 0 ? idx : 0;
 
             chkIsUnbalanced.Checked = p.IsUnbalanced;
             chkIsCritical.Checked = p.IsCritical;
             chkIsTrueDamage.Checked = p.IsTrueDamage;
 
-            idx2 = cmbAnomalyType.Items.IndexOf(p.AnomalyType);
-            cmbAnomalyType.SelectedIndex = idx2 >= 0 ? idx2 : 0;
+            idx = cmbAnomalyType.Items.IndexOf(p.AnomalyType);
+            cmbAnomalyType.SelectedIndex = idx >= 0 ? idx : 0;
 
             nudAnomalyLevel.Value = p.AnomalyLevel;
             nudVulnerability.Value = p.Vulnerability;
