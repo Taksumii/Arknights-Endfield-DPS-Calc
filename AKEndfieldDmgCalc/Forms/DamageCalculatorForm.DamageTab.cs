@@ -7,7 +7,7 @@ using AKEndfieldDmgCalc.Helpers;
 
 namespace EndfieldCalculator
 {
-  
+   
     public partial class DamageCalculatorForm
     {
         private CollapsibleSectionManager sectionManagerLeft;
@@ -37,53 +37,12 @@ namespace EndfieldCalculator
                 }
             };
             tab.Controls.Add(cmbBuildProfiles);
-
-            // Calculate and Expand/Collapse buttons
-            btnCalculate = new Button
-            {
-                Text = "Calculate",
-                Location = new Point(rightCol, yPos - 3),
-                Size = new Size(100, 30),
-                Font = new Font("Arial", 9, FontStyle.Bold),
-                BackColor = Color.LightGreen
-            };
-            btnCalculate.Click += BtnCalculate_Click;
-            tab.Controls.Add(btnCalculate);
-
-            var btnExpandAll = new Button
-            {
-                Text = "Expand All",
-                Location = new Point(rightCol + 110, yPos - 3),
-                Size = new Size(100, 30),
-                Font = new Font("Arial", 8)
-            };
-            btnExpandAll.Click += (s, e) => {
-                sectionManagerLeft.ExpandAll();
-                sectionManagerRight.ExpandAll();
-                RepositionButtonsAndResults(tab);
-            };
-            tab.Controls.Add(btnExpandAll);
-
-            var btnCollapseAll = new Button
-            {
-                Text = "Collapse All",
-                Location = new Point(rightCol + 220, yPos - 3),
-                Size = new Size(100, 30),
-                Font = new Font("Arial", 8)
-            };
-            btnCollapseAll.Click += (s, e) => {
-                sectionManagerLeft.CollapseAll();
-                sectionManagerRight.CollapseAll();
-                RepositionButtonsAndResults(tab);
-            };
-            tab.Controls.Add(btnCollapseAll);
-
             yPos += 40;
 
             // === LEFT COLUMN ===
 
             // === ATTACKER STATS SECTION (Collapsible) ===
-            var attackerSection = new CollapsibleSection(tab, "ATTACKER STATS", leftCol, yPos, 420, Color.FromArgb(230, 240, 255), () => RepositionButtonsAndResults(tab));
+            var attackerSection = new CollapsibleSection(tab, "ATTACKER STATS", leftCol, yPos, 420, Color.FromArgb(230, 240, 255));
             int innerY = 10;
 
             attackerSection.AddControls(
@@ -91,8 +50,8 @@ namespace EndfieldCalculator
                 CreateNumericWithLabel("Weapon Base Attack:", leftCol + 10, ref innerY, 0, 10000, 50, out nudWeaponAttack),
                 CreateNumericWithLabel("Attack % Bonus:", leftCol + 10, ref innerY, 0, 500, 0, out nudAttackPercent, true),
                 CreateNumericWithLabel("Attack Flat Bonus:", leftCol + 10, ref innerY, 0, 5000, 0, out nudAttackFlat),
-                CreateNumericWithLabel("Primary Stat:", leftCol + 10, ref innerY, 0, 2000, 100, out nudPrimaryStat),
-                CreateNumericWithLabel("Secondary Stat:", leftCol + 10, ref innerY, 0, 2000, 50, out nudSecondaryStat),
+                CreateNumericWithDropdown("Primary Stat:", leftCol + 10, ref innerY, 0, 2000, 100, out nudPrimaryStat, out cmbPrimaryStat),
+                CreateNumericWithDropdown("Secondary Stat:", leftCol + 10, ref innerY, 0, 2000, 50, out nudSecondaryStat, out cmbSecondaryStat),
                 CreateNumericWithLabel("Damage Multiplier %:", leftCol + 10, ref innerY, 0, 10000, 100, out nudDamageMultiplier, true),
                 CreateNumericWithLabel("Critical Rate %:", leftCol + 10, ref innerY, 0, 100, 5, out nudCritRate, true),
                 CreateNumericWithLabel("Critical Damage %:", leftCol + 10, ref innerY, 0, 500, 50, out nudCritDamage, true),
@@ -101,7 +60,7 @@ namespace EndfieldCalculator
             sectionManagerLeft.AddSection(attackerSection);
 
             // === DAMAGE BONUSES SECTION (Collapsible) ===
-            var bonusesSection = new CollapsibleSection(tab, "DAMAGE BONUSES", leftCol, attackerSection.GetBottom() + 10, 420, Color.FromArgb(255, 240, 230), () => RepositionButtonsAndResults(tab));
+            var bonusesSection = new CollapsibleSection(tab, "DAMAGE BONUSES", leftCol, attackerSection.GetBottom() + 10, 420, Color.FromArgb(255, 240, 230));
             innerY = 10;
 
             bonusesSection.AddControls(
@@ -115,7 +74,7 @@ namespace EndfieldCalculator
             // === RIGHT COLUMN ===
 
             // === TARGET STATS SECTION (Collapsible) ===
-            var targetSection = new CollapsibleSection(tab, "TARGET STATS", rightCol, 60, 420, Color.FromArgb(255, 230, 230), () => RepositionButtonsAndResults(tab));
+            var targetSection = new CollapsibleSection(tab, "TARGET STATS", rightCol, 60, 420, Color.FromArgb(255, 230, 230));
             innerY = 10;
 
             targetSection.AddControl(CreateNumericWithLabel("Target Defense:", rightCol + 10, ref innerY, -1000, 5000, 100, out nudTargetDefense));
@@ -170,7 +129,8 @@ namespace EndfieldCalculator
 
             sectionManagerRight.AddSection(targetSection);
 
-            var anomalySection = new CollapsibleSection(tab, "ANOMALY", rightCol, targetSection.GetBottom() + 10, 420, Color.FromArgb(240, 255, 240), () => RepositionButtonsAndResults(tab));
+            // === ANOMALY SECTION (Collapsible) ===
+            var anomalySection = new CollapsibleSection(tab, "ANOMALY", rightCol, targetSection.GetBottom() + 10, 420, Color.FromArgb(240, 255, 240));
             innerY = 10;
 
             var lblAnomType = new Label { Text = "Anomaly Type:", Location = new Point(rightCol + 10, innerY), AutoSize = true, Font = new Font("Arial", 9) };
@@ -187,7 +147,7 @@ namespace EndfieldCalculator
             });
             cmbAnomalyType.SelectedIndex = 0;
             cmbAnomalyType.SelectedIndexChanged += (s, e) => {
-               
+                // Auto-set level to 99 if anomaly affects spell level zone
                 string anomType = cmbAnomalyType.SelectedItem?.ToString() ?? "None";
                 if (anomType != "None" && !anomType.Contains("Knock") &&
                     anomType != "Armor Shatter" && anomType != "Smash")
@@ -201,14 +161,14 @@ namespace EndfieldCalculator
 
             anomalySection.AddControl(CreateNumericWithLabel("Anomaly Level (1-4):", rightCol + 10, ref innerY, 1, 4, 1, out nudAnomalyLevel));
 
-            
+          
             nudLevel = new NumericUpDown { Minimum = 1, Maximum = 99, Value = 99, Visible = false };
             anomalySection.AddControl(nudLevel);
 
             sectionManagerRight.AddSection(anomalySection);
 
-        
-            var multipliersSection = new CollapsibleSection(tab, "MULTIPLIER ZONES", rightCol, anomalySection.GetBottom() + 10, 420, Color.FromArgb(255, 250, 230), () => RepositionButtonsAndResults(tab));
+            // === MULTIPLIER ZONES SECTION (Collapsible) ===
+            var multipliersSection = new CollapsibleSection(tab, "MULTIPLIER ZONES", rightCol, anomalySection.GetBottom() + 10, 420, Color.FromArgb(255, 250, 230));
             innerY = 10;
 
             multipliersSection.AddControls(
@@ -221,9 +181,57 @@ namespace EndfieldCalculator
             );
             sectionManagerRight.AddSection(multipliersSection);
 
+            // === BUTTONS AND RESULTS (DYNAMIC POSITION) ===
+            // Calculate position based on the bottom of the last section in each column
+            int leftColBottom = bonusesSection.GetBottom();
+            int rightColBottom = multipliersSection.GetBottom();
+            int buttonY = Math.Max(leftColBottom, rightColBottom) + 20; 
+
+            btnCalculate = new Button
+            {
+                Text = "Calculate Damage",
+                Location = new Point(leftCol, buttonY),
+                Size = new Size(200, 40),
+                Font = new Font("Arial", 12, FontStyle.Bold),
+                BackColor = Color.LightGreen
+            };
+            btnCalculate.Click += BtnCalculate_Click;
+            tab.Controls.Add(btnCalculate);
+
+            // Expand/Collapse All buttons
+            var btnExpandAll = new Button
+            {
+                Text = "Expand All ▼",
+                Location = new Point(leftCol + 210, buttonY),
+                Size = new Size(100, 40),
+                Font = new Font("Arial", 9)
+            };
+            btnExpandAll.Click += (s, e) => {
+                sectionManagerLeft.ExpandAll();
+                sectionManagerRight.ExpandAll();
+                RepositionButtonsAndResults();
+            };
+            tab.Controls.Add(btnExpandAll);
+
+            var btnCollapseAll = new Button
+            {
+                Text = "Collapse All ▶",
+                Location = new Point(leftCol + 320, buttonY),
+                Size = new Size(100, 40),
+                Font = new Font("Arial", 9)
+            };
+            btnCollapseAll.Click += (s, e) => {
+                sectionManagerLeft.CollapseAll();
+                sectionManagerRight.CollapseAll();
+                RepositionButtonsAndResults();
+            };
+            tab.Controls.Add(btnCollapseAll);
+
+            // Store buttons for repositioning
+            tab.Tag = new { btnCalculate, btnExpandAll, btnCollapseAll };
+
             // === RESULTS AS COLLAPSIBLE SECTION ===
-            // Calculate initial position based on right column bottom
-            int resultsY = multipliersSection.GetBottom() + 20;
+            int resultsY = buttonY;
             var resultsSection = new CollapsibleSection(tab, "RESULTS", rightCol, resultsY, 420, Color.FromArgb(230, 255, 230));
             int resultInnerY = 10;
 
@@ -273,7 +281,9 @@ namespace EndfieldCalculator
 
             resultsSection.AddControl(pnlResults);
 
-            var rangeSection = new CollapsibleSection(tab, "DAMAGE RANGE", leftCol, bonusesSection.GetBottom() + 20, 420, Color.FromArgb(255, 240, 255));
+            // === DAMAGE RANGE AS COLLAPSIBLE SECTION ===
+            int rangeY = buttonY + 50;
+            var rangeSection = new CollapsibleSection(tab, "DAMAGE RANGE", leftCol, rangeY, 420, Color.FromArgb(255, 240, 255));
             int rangeInnerY = 10;
 
             var pnlRange = new Panel
@@ -334,12 +344,15 @@ namespace EndfieldCalculator
 
             rangeSection.AddControl(pnlRange);
 
-         
-            int initialBreakdownY = Math.Max(rangeSection.GetBottom(), resultsSection.GetBottom()) + 20;
+            // Store result sections for repositioning
+            var resultSections = new { resultsSection, rangeSection };
+
+            // Breakdown
+            int breakdownY = rangeY + 250;
             var lblBreakdown = new Label
             {
                 Text = "Breakdown:",
-                Location = new Point(leftCol, initialBreakdownY),
+                Location = new Point(leftCol, breakdownY),
                 AutoSize = true,
                 Font = new Font("Arial", 9, FontStyle.Bold)
             };
@@ -348,7 +361,7 @@ namespace EndfieldCalculator
 
             txtBreakdown = new TextBox
             {
-                Location = new Point(leftCol, initialBreakdownY + 25),
+                Location = new Point(leftCol, breakdownY + 25),
                 Size = new Size(870, 150),
                 Multiline = true,
                 ReadOnly = true,
@@ -359,6 +372,7 @@ namespace EndfieldCalculator
             txtBreakdown.Name = "txtBreakdown";
             tab.Controls.Add(txtBreakdown);
 
+            // Update tag to include all repositionable elements
             tab.Tag = new
             {
                 btnCalculate,
@@ -368,40 +382,34 @@ namespace EndfieldCalculator
                 rangeSection,
                 lblBreakdown,
                 txtBreakdown,
-                attackerSection,
                 bonusesSection,
-                targetSection,
-                anomalySection,
                 multipliersSection
             };
-
-            // Do initial positioning
-            RepositionButtonsAndResults(tab);
         }
 
-      
-        private void RepositionButtonsAndResults(TabPage tab)
+        
+        private void RepositionButtonsAndResults()
         {
-            var tag = tab.Tag as dynamic;
+            var damageTab = tabControl.TabPages[0];
+            var tag = damageTab.Tag as dynamic;
             if (tag == null) return;
 
+            // Calculate new button position based on section bottoms
             int leftColBottom = tag.bonusesSection.GetBottom();
-            int rangeY = leftColBottom + 20;
-
-         
             int rightColBottom = tag.multipliersSection.GetBottom();
-            int resultsY = rightColBottom + 20;
+            int newButtonY = Math.Max(leftColBottom, rightColBottom) + 20;
 
-            tag.rangeSection.SetY(rangeY);
+            // Reposition buttons
+            tag.btnCalculate.Location = new Point(tag.btnCalculate.Location.X, newButtonY);
+            tag.btnExpandAll.Location = new Point(tag.btnExpandAll.Location.X, newButtonY);
+            tag.btnCollapseAll.Location = new Point(tag.btnCollapseAll.Location.X, newButtonY);
 
-       
-            tag.resultsSection.SetY(resultsY);
+            // Reposition result sections
+            tag.resultsSection.SetY(newButtonY);
+            tag.rangeSection.SetY(newButtonY + 50);
 
             // Reposition breakdown
-            int leftBottom = tag.rangeSection.GetBottom();
-            int rightBottom = tag.resultsSection.GetBottom();
-            int newBreakdownY = Math.Max(leftBottom, rightBottom) + 20;
-
+            int newBreakdownY = tag.rangeSection.GetBottom() + 20;
             tag.lblBreakdown.Location = new Point(tag.lblBreakdown.Location.X, newBreakdownY);
             tag.txtBreakdown.Location = new Point(tag.txtBreakdown.Location.X, newBreakdownY + 25);
         }
@@ -432,6 +440,48 @@ namespace EndfieldCalculator
 
             panel.Controls.Add(lbl);
             panel.Controls.Add(nud);
+            y += 35;
+
+            return panel;
+        }
+
+        
+        private Control CreateNumericWithDropdown(string labelText, int x, ref int y, decimal min, decimal max, decimal val, out NumericUpDown nud, out ComboBox cmb)
+        {
+            var panel = new Panel { Location = new Point(0, y), Size = new Size(400, 35), BackColor = Color.Transparent };
+
+            var lbl = new Label
+            {
+                Text = labelText,
+                Location = new Point(0, 5),
+                AutoSize = true,
+                Font = new Font("Arial", 9)
+            };
+
+            nud = new NumericUpDown
+            {
+                Location = new Point(180, 0),
+                Width = 90,
+                Minimum = min,
+                Maximum = max,
+                Value = val,
+                DecimalPlaces = 0,
+                Font = new Font("Arial", 9)
+            };
+
+            cmb = new ComboBox
+            {
+                Location = new Point(275, 0),
+                Width = 60,
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Font = new Font("Arial", 8)
+            };
+            cmb.Items.AddRange(new object[] { "STR", "AGL", "INT", "WLL" });
+            cmb.SelectedIndex = 0; 
+
+            panel.Controls.Add(lbl);
+            panel.Controls.Add(nud);
+            panel.Controls.Add(cmb);
             y += 35;
 
             return panel;
@@ -485,7 +535,7 @@ namespace EndfieldCalculator
                 if (txtAvgDamage != null) txtAvgDamage.Text = Math.Floor(result.AverageDamage).ToString("F0");
                 if (txtCritChance != null) txtCritChance.Text = $"{nudCritRate.Value + (decimal)gearBonuses.CritRate}%";
 
-                // Breakdown 
+                // Breakdown showing gear bonuses
                 string gearInfo = "";
                 if (gearBonuses.AttackPercent > 0 || gearBonuses.AttackFlat > 0 ||
                     gearBonuses.ElementalDamageBonus > 0 || gearBonuses.SkillDamageBonus > 0)

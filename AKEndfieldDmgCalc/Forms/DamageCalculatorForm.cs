@@ -21,6 +21,7 @@ namespace EndfieldCalculator
         private NumericUpDown nudVulnerability, nudAmplification, nudSanctuary;
         private NumericUpDown nudFragility, nudDamageReduction, nudSpecialMultiplier;
         private ComboBox cmbDamageType, cmbAnomalyType;
+        private ComboBox cmbPrimaryStat, cmbSecondaryStat; // NEW: Stat attribute dropdowns
         private CheckBox chkIsUnbalanced, chkIsCritical, chkIsTrueDamage;
         private TextBox txtFinalAttack, txtBaseDamage, txtFinalDamage, txtBreakdown;
         private TextBox txtMinDamage, txtMaxDamage, txtAvgDamage, txtCritChance;
@@ -66,7 +67,7 @@ namespace EndfieldCalculator
 
         private void InitializeComponent()
         {
-            this.Text = "Arknights: Endfield Damage Calculator v1.2";
+            this.Text = "Arknights: Endfield Damage Calculator v1.3";
             this.Size = new Size(950, 800);
             this.StartPosition = FormStartPosition.CenterScreen;
 
@@ -98,6 +99,6 @@ namespace EndfieldCalculator
             InitializeComparisonTab(tabComparison);
             InitializeBuildTab(tabBuilds);
         }
-     
+
     }
 }
