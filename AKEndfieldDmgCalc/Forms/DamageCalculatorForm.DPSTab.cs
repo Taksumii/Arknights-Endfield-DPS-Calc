@@ -7,7 +7,7 @@ namespace EndfieldCalculator
 {
 
     /// DPS Calculator Tab initialization and logic
-   
+
     public partial class DamageCalculatorForm
     {
         private void InitializeDPSTab(TabPage tab)
@@ -41,7 +41,7 @@ namespace EndfieldCalculator
                 Location = new Point(seqX + 50, yPos - 3),
                 Width = 80,
                 Maximum = 10000,
-                DecimalPlaces = 1,
+                DecimalPlaces = 2,
                 Value = 36,
                 Font = new Font("Arial", 9)
             };
@@ -55,7 +55,7 @@ namespace EndfieldCalculator
                 Location = new Point(seqX + 50, yPos - 3),
                 Width = 80,
                 Maximum = 10000,
-                DecimalPlaces = 1,
+                DecimalPlaces = 2,
                 Value = 54,
                 Font = new Font("Arial", 9)
             };
@@ -69,7 +69,7 @@ namespace EndfieldCalculator
                 Location = new Point(seqX + 50, yPos - 3),
                 Width = 80,
                 Maximum = 10000,
-                DecimalPlaces = 1,
+                DecimalPlaces = 2,
                 Value = 56,
                 Font = new Font("Arial", 9)
             };
@@ -83,7 +83,7 @@ namespace EndfieldCalculator
                 Location = new Point(seqX + 50, yPos - 3),
                 Width = 80,
                 Maximum = 10000,
-                DecimalPlaces = 1,
+                DecimalPlaces = 2,
                 Value = 88,
                 Font = new Font("Arial", 9)
             };
@@ -97,7 +97,7 @@ namespace EndfieldCalculator
                 Location = new Point(seqX + 50, yPos - 3),
                 Width = 80,
                 Maximum = 10000,
-                DecimalPlaces = 1,
+                DecimalPlaces = 2,
                 Value = 119,
                 Font = new Font("Arial", 9),
                 Enabled = false
@@ -106,21 +106,21 @@ namespace EndfieldCalculator
             AddLabel(tab, "%", seqX + 135, yPos);
 
             yPos += 40;
-            nudSeqTime = AddNumeric(tab, "Full Sequence Time (seconds):", leftCol, ref yPos, 0.1m, 30, 3, true);
+            nudSeqTime = AddNumeric(tab, "Full Sequence Time (seconds):", leftCol, ref yPos, 0.1m, 30, 3, 2);
 
             yPos += 20;
             AddLabel(tab, "=== BATTLE SKILL ===", leftCol, yPos, true);
             yPos += 35;
 
-            nudSkillDamageBonus = AddNumeric(tab, "Skill Damage Bonus % (avg):", leftCol, ref yPos, 0, 1000, 50, true);
-            nudSkillUptime = AddNumeric(tab, "Skill Uptime % (active time):", leftCol, ref yPos, 0, 100, 30, true);
+            nudSkillDamageBonus = AddNumeric(tab, "Skill Damage Bonus % (avg):", leftCol, ref yPos, 0, 1000, 50, 2);
+            nudSkillUptime = AddNumeric(tab, "Skill Uptime % (active time):", leftCol, ref yPos, 0, 100, 30, 2);
 
             yPos += 20;
             AddLabel(tab, "=== ULTIMATE ===", leftCol, yPos, true);
             yPos += 35;
 
-            nudUltDamageBonus = AddNumeric(tab, "Ultimate Damage Bonus %:", leftCol, ref yPos, 0, 1000, 80, true);
-            nudUltUptime = AddNumeric(tab, "Ultimate Uptime % (active time):", leftCol, ref yPos, 0, 100, 50, true);
+            nudUltDamageBonus = AddNumeric(tab, "Ultimate Damage Bonus %:", leftCol, ref yPos, 0, 1000, 80, 2);
+            nudUltUptime = AddNumeric(tab, "Ultimate Uptime % (active time):", leftCol, ref yPos, 0, 100, 50, 2);
 
             yPos += 30;
             btnCalculateDPS = new Button
@@ -227,15 +227,15 @@ namespace EndfieldCalculator
                     (double)nudUltUptime.Value
                 );
 
-                // Display results
-                txtBaseDPS.Text = Math.Floor(result.AvgBaseDPS).ToString("N0");
-                txtWithSkillDPS.Text = Math.Floor(result.AvgDPSWithSkill).ToString("N0");
-                txtWithUltDPS.Text = Math.Floor(result.AvgDPSWithUlt).ToString("N0");
-                txtCombinedDPS.Text = Math.Floor(result.AvgCombinedDPS).ToString("N0");
+                // Display results with 2 decimal places
+                txtBaseDPS.Text = result.AvgBaseDPS.ToString("N2");
+                txtWithSkillDPS.Text = result.AvgDPSWithSkill.ToString("N2");
+                txtWithUltDPS.Text = result.AvgDPSWithUlt.ToString("N2");
+                txtCombinedDPS.Text = result.AvgCombinedDPS.ToString("N2");
 
-                if (txtMinDPS != null) txtMinDPS.Text = Math.Floor(result.MinCombinedDPS).ToString("N0");
-                if (txtMaxDPS != null) txtMaxDPS.Text = Math.Floor(result.MaxCombinedDPS).ToString("N0");
-                if (txtAvgDPSRange != null) txtAvgDPSRange.Text = Math.Floor(result.AvgCombinedDPS).ToString("N0");
+                if (txtMinDPS != null) txtMinDPS.Text = result.MinCombinedDPS.ToString("N2");
+                if (txtMaxDPS != null) txtMaxDPS.Text = result.MaxCombinedDPS.ToString("N2");
+                if (txtAvgDPSRange != null) txtAvgDPSRange.Text = result.AvgCombinedDPS.ToString("N2");
 
                 txtDPSBreakdown.Text = result.Breakdown;
             }

@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace EndfieldCalculator
 {
-  
+
     public partial class DamageCalculatorForm
     {
         private Label AddLabel(Control parent, string text, int x, int y, bool bold = false)
@@ -20,7 +20,7 @@ namespace EndfieldCalculator
             return lbl;
         }
 
-        private NumericUpDown AddNumeric(Control parent, string label, int x, ref int y, decimal min, decimal max, decimal val, bool percent = false)
+        private NumericUpDown AddNumeric(Control parent, string label, int x, ref int y, decimal min, decimal max, decimal val, int decimalPlaces = 0)
         {
             AddLabel(parent, label, x, y);
             var nud = new NumericUpDown
@@ -30,7 +30,7 @@ namespace EndfieldCalculator
                 Minimum = min,
                 Maximum = max,
                 Value = val,
-                DecimalPlaces = percent ? 1 : 0,
+                DecimalPlaces = decimalPlaces,
                 Font = new Font("Arial", 9)
             };
             parent.Controls.Add(nud);

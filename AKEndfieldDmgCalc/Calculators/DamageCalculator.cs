@@ -2,12 +2,12 @@
 
 namespace EndfieldCalculator
 {
-    
+
     /// Contains all damage calculation formulas
-    
+
     public static class DamageCalculator
     {
-        
+
         public class DamageResult
         {
             public double FinalAttack { get; set; }
@@ -33,9 +33,9 @@ namespace EndfieldCalculator
             public double DamageReductionZone { get; set; }
         }
 
-     
+
         /// Calculates final attack power
-       
+
         public static double CalculateFinalAttack(
             double baseAttack,
             double weaponAttack,
@@ -47,12 +47,12 @@ namespace EndfieldCalculator
             double statBonus = primaryStat * 0.005 + secondaryStat * 0.002;
             double finalAtk = (baseAttack + weaponAttack) * (1 + attackPercent / 100) + attackFlat;
             finalAtk *= 1 + statBonus;
-            return Math.Floor(finalAtk);
+            return finalAtk; // Removed Math.Floor
         }
 
-       
+
         /// Calculates anomaly damage multiplier
-     
+
         public static double CalculateAnomalyMultiplier(string anomalyType, int anomalyLevel)
         {
             switch (anomalyType)
@@ -80,7 +80,7 @@ namespace EndfieldCalculator
             }
         }
 
-      
+
         /// Calculates spell level zone multiplier
 
         public static double CalculateSpellLevelZone(string anomalyType, double level)
@@ -98,7 +98,7 @@ namespace EndfieldCalculator
 
 
         /// Calculates defense zone multiplier
-       
+
         public static double CalculateDefenseZone(double defense, bool isTrueDamage)
         {
             if (isTrueDamage)
@@ -110,8 +110,8 @@ namespace EndfieldCalculator
                 return 2.0 - Math.Pow(0.99, -defense);
         }
 
-        
-        /// Performs complete damage calculation
+
+       
 
         public static DamageResult Calculate(
             // Attacker Stats
@@ -178,7 +178,7 @@ namespace EndfieldCalculator
             double critRateDecimal = critRate / 100.0;
             result.AverageDamage = result.MinDamage * (1 - critRateDecimal) + result.MaxDamage * critRateDecimal;
 
-            // Current damage (respecting force crit)
+            // Current damage
             double preDmg = baseDmg * result.AnomalyMultiplier * actualCritZone * result.DamageBonus *
                            result.DamageReductionZone * result.VulnerabilityZone * result.AmplificationZone *
                            result.SanctuaryZone * result.FragilityZone * result.UnbalancedZone *
@@ -195,7 +195,7 @@ namespace EndfieldCalculator
         private static string GenerateBreakdown(DamageResult result, double baseDmg, bool isCrit, double critRate)
         {
             return $@"Attack Calculation:
-              Final Attack: {Math.Floor(result.FinalAttack)}
+              Final Attack: {result.FinalAttack:F2}
             
             Damage Zones:
               Base: {baseDmg:F2} | Anomaly: ×{result.AnomalyMultiplier:F2} | Crit: ×{(isCrit ? result.CritZone : 1.0):F2}
@@ -209,13 +209,13 @@ namespace EndfieldCalculator
             Defense & Resistance:
               Defense: ×{result.DefenseZone:F4} | Resistance: ×{result.ResistanceZone:F2}
               
-            CURRENT DAMAGE: {Math.Floor(result.FinalDamage)}
+            CURRENT DAMAGE: {result.FinalDamage:F2}
             
             Damage Range ({critRate}% crit rate):
-              Min (No Crit): {Math.Floor(result.MinDamage)}
-              Max (Crit): {Math.Floor(result.MaxDamage)}
-              Average: {Math.Floor(result.AverageDamage)}
-              Variance: {Math.Floor(result.MaxDamage - result.MinDamage)}";
+              Min (No Crit): {result.MinDamage:F2}
+              Max (Crit): {result.MaxDamage:F2}
+              Average: {result.AverageDamage:F2}
+              Variance: {(result.MaxDamage - result.MinDamage):F2}";
         }
     }
 }

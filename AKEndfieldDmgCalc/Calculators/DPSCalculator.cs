@@ -107,6 +107,8 @@ namespace AKEndfieldDmgCalc.Calculators
         }
 
         private static string GenerateBreakdown(
+
+           
             DPSResult result,
             double minSeqDamage,
             double maxSeqDamage,
@@ -117,39 +119,39 @@ namespace AKEndfieldDmgCalc.Calculators
             double skillUptime,
             double ultDamageBonus,
             double ultUptime)
-        {
-            return $@"=== DPS BREAKDOWN ===
-
+                {
+                    return $@"=== DPS BREAKDOWN ===
+           
             Basic Attack Sequence ({(result.Is5HitCombo ? "5-hit" : "4-hit")} combo):
               Hits: {result.HitSequence}
-              Total: {result.SequenceTotal * 100:F1}% over {result.SequenceTime} seconds
+              Total: {result.SequenceTotal * 100:F2}% over {result.SequenceTime} seconds
               
             Damage per Sequence:
-              Min: {minSeqDamage:F0} | Max: {maxSeqDamage:F0} | Avg: {avgSeqDamage:F0}
+              Min: {minSeqDamage:F2} | Max: {maxSeqDamage:F2} | Avg: {avgSeqDamage:F2}
               
             Base DPS (no buffs):
-              Min: {result.MinBaseDPS:F0} | Max: {result.MaxBaseDPS:F0} | Avg: {result.AvgBaseDPS:F0}
+              Min: {result.MinBaseDPS:F2} | Max: {result.MaxBaseDPS:F2} | Avg: {result.AvgBaseDPS:F2}
             
             Battle Skill:
               Damage Bonus: +{skillDamageBonus}%
               Active Time: {skillUptime}% uptime
               Avg Multiplier: ×{avgSkillBonus:F2}
-              DPS: Min {result.MinDPSWithSkill:F0} | Max {result.MaxDPSWithSkill:F0} | Avg {result.AvgDPSWithSkill:F0}
+              DPS: Min {result.MinDPSWithSkill:F2} | Max {result.MaxDPSWithSkill:F2} | Avg {result.AvgDPSWithSkill:F2}
             
             Ultimate:
               Damage Bonus: +{ultDamageBonus}%
               Active Time: {ultUptime}% uptime
               Avg Multiplier: ×{avgUltBonus:F2}
-              DPS: Min {result.MinDPSWithUlt:F0} | Max {result.MaxDPSWithUlt:F0} | Avg {result.AvgDPSWithUlt:F0}
+              DPS: Min {result.MinDPSWithUlt:F2} | Max {result.MaxDPSWithUlt:F2} | Avg {result.AvgDPSWithUlt:F2}
               
             Combined (Skill + Ult):
-              Min DPS: {result.MinCombinedDPS:F0}
-              Max DPS: {result.MaxCombinedDPS:F0}
-              Avg DPS: {result.AvgCombinedDPS:F0}
-              Variance: {result.MaxCombinedDPS - result.MinCombinedDPS:F0}
+              Min DPS: {result.MinCombinedDPS:F2}
+              Max DPS: {result.MaxCombinedDPS:F2}
+              Avg DPS: {result.AvgCombinedDPS:F2}
+              Variance: {(result.MaxCombinedDPS - result.MinCombinedDPS):F2}
             
-            30 Second Damage: {result.AvgCombinedDPS * 30:F0}
-            60 Second Damage: {result.AvgCombinedDPS * 60:F0}";
+            30 Second Damage: {(result.AvgCombinedDPS * 30):F2}
+            60 Second Damage: {(result.AvgCombinedDPS * 60):F2}";
         }
     }
 }

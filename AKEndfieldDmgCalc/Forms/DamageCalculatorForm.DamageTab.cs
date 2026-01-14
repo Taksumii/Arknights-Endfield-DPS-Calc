@@ -13,7 +13,7 @@ namespace EndfieldCalculator
         private CollapsibleSectionManager sectionManagerLeft;
         private CollapsibleSectionManager sectionManagerRight;
 
-       
+
         private ComboBox cmbPrimaryStatType;
         private ComboBox cmbSecondaryStatType;
 
@@ -86,15 +86,15 @@ namespace EndfieldCalculator
 
             // === LEFT COLUMN ===
 
-            // === ATTACKER STATS SECTION (Collapsible) ===
+            
             var attackerSection = new CollapsibleSection(tab, "ATTACKER STATS", leftCol, yPos, 420, Color.FromArgb(230, 240, 255), () => RepositionButtonsAndResults(tab));
             int innerY = 10;
 
             attackerSection.AddControls(
                 CreateNumericWithLabel("Operator Base Attack:", leftCol + 10, ref innerY, 0, 10000, 100, out nudBaseAttack),
                 CreateNumericWithLabel("Weapon Base Attack:", leftCol + 10, ref innerY, 0, 10000, 50, out nudWeaponAttack),
-                CreateNumericWithLabel("Attack % Bonus:", leftCol + 10, ref innerY, 0, 500, 0, out nudAttackPercent, true),
-                CreateNumericWithLabel("Attack Flat Bonus:", leftCol + 10, ref innerY, 0, 5000, 0, out nudAttackFlat)
+                CreateNumericWithLabel("Attack % Bonus:", leftCol + 10, ref innerY, 0, 500, 0, out nudAttackPercent, 2),
+                CreateNumericWithLabel("Attack Flat Bonus:", leftCol + 10, ref innerY, 0, 5000, 0, out nudAttackFlat, 2)
             );
 
             attackerSection.AddControl(CreateStatWithDropdown("Primary Stat:", leftCol + 10, ref innerY, 0, 2000, 100, out nudPrimaryStat, out cmbPrimaryStatType));
@@ -102,33 +102,33 @@ namespace EndfieldCalculator
             attackerSection.AddControl(CreateStatWithDropdown("Secondary Stat:", leftCol + 10, ref innerY, 0, 2000, 50, out nudSecondaryStat, out cmbSecondaryStatType));
 
             attackerSection.AddControls(
-                CreateNumericWithLabel("Damage Multiplier %:", leftCol + 10, ref innerY, 0, 10000, 100, out nudDamageMultiplier, true),
-                CreateNumericWithLabel("Critical Rate %:", leftCol + 10, ref innerY, 0, 100, 5, out nudCritRate, true),
-                CreateNumericWithLabel("Critical Damage %:", leftCol + 10, ref innerY, 0, 500, 50, out nudCritDamage, true),
-                CreateNumericWithLabel("Source Stone Artistry:", leftCol + 10, ref innerY, 0, 1000, 0, out nudSourceStoneArtistry)
+                CreateNumericWithLabel("Damage Multiplier %:", leftCol + 10, ref innerY, 0, 10000, 100, out nudDamageMultiplier, 2),
+                CreateNumericWithLabel("Critical Rate %:", leftCol + 10, ref innerY, 0, 100, 5, out nudCritRate, 2),
+                CreateNumericWithLabel("Critical Damage %:", leftCol + 10, ref innerY, 0, 500, 50, out nudCritDamage, 2),
+                CreateNumericWithLabel("Source Stone Artistry:", leftCol + 10, ref innerY, 0, 1000, 0, out nudSourceStoneArtistry, 2)
             );
             sectionManagerLeft.AddSection(attackerSection);
 
-            // === DAMAGE BONUSES SECTION (Collapsible) ===
+            
             var bonusesSection = new CollapsibleSection(tab, "DAMAGE BONUSES", leftCol, attackerSection.GetBottom() + 10, 420, Color.FromArgb(255, 240, 230), () => RepositionButtonsAndResults(tab));
             innerY = 10;
 
             bonusesSection.AddControls(
-                CreateNumericWithLabel("Elemental Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudElementalBonus, true),
-                CreateNumericWithLabel("Skill Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudSkillBonus, true),
-                CreateNumericWithLabel("Unbalance Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudUnbalanceBonus, true),
-                CreateNumericWithLabel("Other Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudOtherBonus, true)
+                CreateNumericWithLabel("Elemental Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudElementalBonus, 2),
+                CreateNumericWithLabel("Skill Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudSkillBonus, 2),
+                CreateNumericWithLabel("Unbalance Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudUnbalanceBonus, 2),
+                CreateNumericWithLabel("Other Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudOtherBonus, 2)
             );
             sectionManagerLeft.AddSection(bonusesSection);
 
             // === RIGHT COLUMN ===
 
-            // === TARGET STATS SECTION (Collapsible) ===
+           
             var targetSection = new CollapsibleSection(tab, "TARGET STATS", rightCol, 60, 420, Color.FromArgb(255, 230, 230), () => RepositionButtonsAndResults(tab));
             innerY = 10;
 
-            targetSection.AddControl(CreateNumericWithLabel("Target Defense:", rightCol + 10, ref innerY, -1000, 5000, 100, out nudTargetDefense));
-            targetSection.AddControl(CreateNumericWithLabel("Target Resistance:", rightCol + 10, ref innerY, 0, 100, 20, out nudTargetResistance));
+            targetSection.AddControl(CreateNumericWithLabel("Target Defense:", rightCol + 10, ref innerY, -1000, 5000, 100, out nudTargetDefense, 2));
+            targetSection.AddControl(CreateNumericWithLabel("Target Resistance:", rightCol + 10, ref innerY, 0, 100, 20, out nudTargetResistance, 2));
 
             // Damage Type dropdown
             var lblDmgType = new Label { Text = "Damage Type:", Location = new Point(rightCol + 10, innerY), AutoSize = true, Font = new Font("Arial", 9) };
@@ -221,16 +221,16 @@ namespace EndfieldCalculator
             innerY = 10;
 
             multipliersSection.AddControls(
-                CreateNumericWithLabel("Vulnerability %:", rightCol + 10, ref innerY, 0, 200, 0, out nudVulnerability, true),
-                CreateNumericWithLabel("Amplification %:", rightCol + 10, ref innerY, 0, 200, 0, out nudAmplification, true),
-                CreateNumericWithLabel("Sanctuary %:", rightCol + 10, ref innerY, 0, 100, 0, out nudSanctuary, true),
-                CreateNumericWithLabel("Fragility %:", rightCol + 10, ref innerY, 0, 200, 0, out nudFragility, true),
-                CreateNumericWithLabel("Damage Reduction %:", rightCol + 10, ref innerY, 0, 100, 0, out nudDamageReduction, true),
-                CreateNumericWithLabel("Special Multiplier %:", rightCol + 10, ref innerY, 0, 200, 0, out nudSpecialMultiplier, true)
+                CreateNumericWithLabel("Vulnerability %:", rightCol + 10, ref innerY, 0, 200, 0, out nudVulnerability, 2),
+                CreateNumericWithLabel("Amplification %:", rightCol + 10, ref innerY, 0, 200, 0, out nudAmplification, 2),
+                CreateNumericWithLabel("Sanctuary %:", rightCol + 10, ref innerY, 0, 100, 0, out nudSanctuary, 2),
+                CreateNumericWithLabel("Fragility %:", rightCol + 10, ref innerY, 0, 200, 0, out nudFragility, 2),
+                CreateNumericWithLabel("Damage Reduction %:", rightCol + 10, ref innerY, 0, 100, 0, out nudDamageReduction, 2),
+                CreateNumericWithLabel("Special Multiplier %:", rightCol + 10, ref innerY, 0, 200, 0, out nudSpecialMultiplier, 2)
             );
             sectionManagerRight.AddSection(multipliersSection);
 
-          
+
             int resultsY = multipliersSection.GetBottom() + 20;
             var resultsSection = new CollapsibleSection(tab, "RESULTS", rightCol, resultsY, 420, Color.FromArgb(230, 255, 230));
             int resultInnerY = 10;
@@ -414,7 +414,7 @@ namespace EndfieldCalculator
             tag.txtBreakdown.Location = new Point(tag.txtBreakdown.Location.X, newBreakdownY + 25);
         }
 
-       
+
         private Control CreateStatWithDropdown(string labelText, int x, ref int y, decimal min, decimal max, decimal val, out NumericUpDown nud, out ComboBox cmb)
         {
             var panel = new Panel { Location = new Point(0, y), Size = new Size(400, 35), BackColor = Color.Transparent };
@@ -434,7 +434,7 @@ namespace EndfieldCalculator
                 Minimum = min,
                 Maximum = max,
                 Value = val,
-                DecimalPlaces = 0,
+                DecimalPlaces = 2,
                 Font = new Font("Arial", 9)
             };
 
@@ -446,7 +446,7 @@ namespace EndfieldCalculator
                 Font = new Font("Arial", 9)
             };
             cmb.Items.AddRange(new object[] { "STR", "AGL", "INT", "WIL" });
-            cmb.SelectedIndex = 0; 
+            cmb.SelectedIndex = 0;
 
             panel.Controls.Add(lbl);
             panel.Controls.Add(nud);
@@ -457,7 +457,7 @@ namespace EndfieldCalculator
         }
 
 
-        private Control CreateNumericWithLabel(string labelText, int x, ref int y, decimal min, decimal max, decimal val, out NumericUpDown nud, bool percent = false)
+        private Control CreateNumericWithLabel(string labelText, int x, ref int y, decimal min, decimal max, decimal val, out NumericUpDown nud, int decimalPlaces = 0)
         {
             var panel = new Panel { Location = new Point(0, y), Size = new Size(400, 35), BackColor = Color.Transparent };
 
@@ -476,7 +476,7 @@ namespace EndfieldCalculator
                 Minimum = min,
                 Maximum = max,
                 Value = val,
-                DecimalPlaces = percent ? 1 : 0,
+                DecimalPlaces = decimalPlaces,
                 Font = new Font("Arial", 9)
             };
 
@@ -524,16 +524,16 @@ namespace EndfieldCalculator
                     chkIsCritical.Checked
                 );
 
-                // Display results
-                txtFinalAttack.Text = Math.Floor(result.FinalAttack).ToString("F0");
-                txtBaseDamage.Text = Math.Floor(result.BaseDamage).ToString("F0");
-                txtFinalDamage.Text = Math.Floor(result.FinalDamage).ToString("F0") +
+               
+                txtFinalAttack.Text = result.FinalAttack.ToString("F2");
+                txtBaseDamage.Text = result.BaseDamage.ToString("F2");
+                txtFinalDamage.Text = result.FinalDamage.ToString("F2") +
                                      (chkIsCritical.Checked ? " (CRIT!)" : "");
 
-                if (txtMinDamage != null) txtMinDamage.Text = Math.Floor(result.MinDamage).ToString("F0");
-                if (txtMaxDamage != null) txtMaxDamage.Text = Math.Floor(result.MaxDamage).ToString("F0");
-                if (txtAvgDamage != null) txtAvgDamage.Text = Math.Floor(result.AverageDamage).ToString("F0");
-                if (txtCritChance != null) txtCritChance.Text = $"{nudCritRate.Value + (decimal)gearBonuses.CritRate}%";
+                if (txtMinDamage != null) txtMinDamage.Text = result.MinDamage.ToString("F2");
+                if (txtMaxDamage != null) txtMaxDamage.Text = result.MaxDamage.ToString("F2");
+                if (txtAvgDamage != null) txtAvgDamage.Text = result.AverageDamage.ToString("F2");
+                if (txtCritChance != null) txtCritChance.Text = $"{nudCritRate.Value + (decimal)gearBonuses.CritRate:F2}%";
 
                 // Breakdown with stat type info
                 string gearInfo = "";
@@ -541,20 +541,20 @@ namespace EndfieldCalculator
                     gearBonuses.ElementalDamageBonus > 0 || gearBonuses.SkillDamageBonus > 0)
                 {
                     gearInfo = "\nGear Bonuses Applied:\n";
-                    if (gearBonuses.AttackFlat > 0) gearInfo += $"  +{gearBonuses.AttackFlat} Flat ATK\n";
-                    if (gearBonuses.AttackPercent > 0) gearInfo += $"  +{gearBonuses.AttackPercent}% ATK\n";
-                    if (gearBonuses.CritRate > 0) gearInfo += $"  +{gearBonuses.CritRate}% Crit Rate\n";
-                    if (gearBonuses.CritDamage > 0) gearInfo += $"  +{gearBonuses.CritDamage}% Crit Damage\n";
-                    if (gearBonuses.ElementalDamageBonus > 0) gearInfo += $"  +{gearBonuses.ElementalDamageBonus}% Elemental DMG\n";
-                    if (gearBonuses.SkillDamageBonus > 0) gearInfo += $"  +{gearBonuses.SkillDamageBonus}% Skill DMG\n";
-                    if (gearBonuses.AllDamageBonus > 0) gearInfo += $"  +{gearBonuses.AllDamageBonus}% All DMG\n";
-                    if (gearBonuses.DamageReduction > 0) gearInfo += $"  +{gearBonuses.DamageReduction}% DMG Reduction\n";
+                    if (gearBonuses.AttackFlat > 0) gearInfo += $"  +{gearBonuses.AttackFlat:F2} Flat ATK\n";
+                    if (gearBonuses.AttackPercent > 0) gearInfo += $"  +{gearBonuses.AttackPercent:F2}% ATK\n";
+                    if (gearBonuses.CritRate > 0) gearInfo += $"  +{gearBonuses.CritRate:F2}% Crit Rate\n";
+                    if (gearBonuses.CritDamage > 0) gearInfo += $"  +{gearBonuses.CritDamage:F2}% Crit Damage\n";
+                    if (gearBonuses.ElementalDamageBonus > 0) gearInfo += $"  +{gearBonuses.ElementalDamageBonus:F2}% Elemental DMG\n";
+                    if (gearBonuses.SkillDamageBonus > 0) gearInfo += $"  +{gearBonuses.SkillDamageBonus:F2}% Skill DMG\n";
+                    if (gearBonuses.AllDamageBonus > 0) gearInfo += $"  +{gearBonuses.AllDamageBonus:F2}% All DMG\n";
+                    if (gearBonuses.DamageReduction > 0) gearInfo += $"  +{gearBonuses.DamageReduction:F2}% DMG Reduction\n";
                 }
 
                 // Add stat type info
                 string statInfo = $"\nStat Configuration:\n";
-                statInfo += $"  Primary: {nudPrimaryStat.Value} ({cmbPrimaryStatType.SelectedItem})\n";
-                statInfo += $"  Secondary: {nudSecondaryStat.Value} ({cmbSecondaryStatType.SelectedItem})\n";
+                statInfo += $"  Primary: {nudPrimaryStat.Value:F2} ({cmbPrimaryStatType.SelectedItem})\n";
+                statInfo += $"  Secondary: {nudSecondaryStat.Value:F2} ({cmbSecondaryStatType.SelectedItem})\n";
 
                 txtBreakdown.Text = statInfo + gearInfo + "\n" + result.Breakdown;
             }
