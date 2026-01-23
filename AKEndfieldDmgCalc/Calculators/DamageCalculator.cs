@@ -144,8 +144,8 @@ namespace EndfieldCalculator
             result.CritZone = 1.0 + critDamage / 100;
             double actualCritZone = forceCritical ? result.CritZone : 1.0;
 
-            result.DamageBonus = 1.0 + (elementalBonus + skillBonus + unbalanceBonus + otherBonus) / 100;
-            result.VulnerabilityZone = 1.0 + vulnerability / 100;
+            result.DamageBonus = 1.0 + (elementalBonus + skillBonus + otherBonus) / 100;
+            result.VulnerabilityZone = 1.0 + vulnerability + unbalanceBonus / 100;
             result.AmplificationZone = 1.0 + amplification / 100;
             result.SanctuaryZone = 1.0 - sanctuary / 100;
             result.FragilityZone = 1.0 + fragility / 100;
