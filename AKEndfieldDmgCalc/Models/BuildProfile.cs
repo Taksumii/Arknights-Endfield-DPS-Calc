@@ -28,7 +28,13 @@
         // Damage Bonuses
         public decimal ElementalBonus { get; set; }
         public decimal SkillBonus { get; set; }
+
+        
+        public bool IsStaggered { get; set; } 
+
+       
         public decimal UnbalanceBonus { get; set; }
+
         public decimal OtherBonus { get; set; }
 
         // Target Stats

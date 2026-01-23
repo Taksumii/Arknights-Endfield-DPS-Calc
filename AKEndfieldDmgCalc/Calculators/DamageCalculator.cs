@@ -47,7 +47,7 @@ namespace EndfieldCalculator
             double statBonus = primaryStat * 0.005 + secondaryStat * 0.002;
             double finalAtk = (baseAttack + weaponAttack) * (1 + attackPercent / 100) + attackFlat;
             finalAtk *= 1 + statBonus;
-            return finalAtk; // Removed Math.Floor
+            return finalAtk; 
         }
 
 

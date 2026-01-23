@@ -17,6 +17,9 @@ namespace EndfieldCalculator
         private ComboBox cmbPrimaryStatType;
         private ComboBox cmbSecondaryStatType;
 
+        // Add new checkbox for Staggered
+        private CheckBox chkStaggered;
+
         private void InitializeDamageTab(TabPage tab)
         {
             tab.AutoScroll = true;
@@ -86,7 +89,7 @@ namespace EndfieldCalculator
 
             // === LEFT COLUMN ===
 
-            
+            // === ATTACKER STATS SECTION (Collapsible) ===
             var attackerSection = new CollapsibleSection(tab, "ATTACKER STATS", leftCol, yPos, 420, Color.FromArgb(230, 240, 255), () => RepositionButtonsAndResults(tab));
             int innerY = 10;
 
@@ -109,21 +112,33 @@ namespace EndfieldCalculator
             );
             sectionManagerLeft.AddSection(attackerSection);
 
-            
+            // === DAMAGE BONUSES SECTION (Collapsible) ===
             var bonusesSection = new CollapsibleSection(tab, "DAMAGE BONUSES", leftCol, attackerSection.GetBottom() + 10, 420, Color.FromArgb(255, 240, 230), () => RepositionButtonsAndResults(tab));
             innerY = 10;
 
             bonusesSection.AddControls(
                 CreateNumericWithLabel("Elemental Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudElementalBonus, 2),
                 CreateNumericWithLabel("Skill Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudSkillBonus, 2),
-                CreateNumericWithLabel("Unbalance Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudUnbalanceBonus, 2),
                 CreateNumericWithLabel("Other Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudOtherBonus, 2)
             );
+
+            
+            chkStaggered = new CheckBox
+            {
+                Text = "Target is Staggered (+30% DMG)",
+                Location = new Point(10, innerY),
+                Width = 300,
+                Font = new Font("Arial", 9, FontStyle.Bold),
+                ForeColor = Color.DarkOrange
+            };
+            bonusesSection.AddControl(chkStaggered);
+            innerY += 30;
+
             sectionManagerLeft.AddSection(bonusesSection);
 
             // === RIGHT COLUMN ===
 
-           
+            // === TARGET STATS SECTION (Collapsible) ===
             var targetSection = new CollapsibleSection(tab, "TARGET STATS", rightCol, 60, 420, Color.FromArgb(255, 230, 230), () => RepositionButtonsAndResults(tab));
             innerY = 10;
 
@@ -493,6 +508,9 @@ namespace EndfieldCalculator
             {
                 var gearBonuses = CalculateGearBonuses();
 
+                // Calculate staggered bonus - flat 30% if checked
+                double staggeredBonus = chkStaggered.Checked ? 30.0 : 0.0;
+
                 var result = DamageCalculator.Calculate(
                     (double)nudBaseAttack.Value,
                     (double)nudWeaponAttack.Value,
@@ -507,7 +525,7 @@ namespace EndfieldCalculator
                     (double)nudSourceStoneArtistry.Value,
                     (double)nudElementalBonus.Value + gearBonuses.ElementalDamageBonus,
                     (double)nudSkillBonus.Value + gearBonuses.SkillDamageBonus + gearBonuses.AllDamageBonus,
-                    (double)nudUnbalanceBonus.Value,
+                    staggeredBonus, // Pass staggered bonus here
                     (double)nudOtherBonus.Value,
                     (double)nudTargetDefense.Value,
                     (double)nudTargetResistance.Value,
@@ -524,7 +542,7 @@ namespace EndfieldCalculator
                     chkIsCritical.Checked
                 );
 
-               
+                // Display results with 2 decimal places
                 txtFinalAttack.Text = result.FinalAttack.ToString("F2");
                 txtBaseDamage.Text = result.BaseDamage.ToString("F2");
                 txtFinalDamage.Text = result.FinalDamage.ToString("F2") +
@@ -555,6 +573,12 @@ namespace EndfieldCalculator
                 string statInfo = $"\nStat Configuration:\n";
                 statInfo += $"  Primary: {nudPrimaryStat.Value:F2} ({cmbPrimaryStatType.SelectedItem})\n";
                 statInfo += $"  Secondary: {nudSecondaryStat.Value:F2} ({cmbSecondaryStatType.SelectedItem})\n";
+
+                // Add staggered info
+                if (chkStaggered.Checked)
+                {
+                    statInfo += $"  Target is Staggered: +30% DMG\n";
+                }
 
                 txtBreakdown.Text = statInfo + gearInfo + "\n" + result.Breakdown;
             }

@@ -116,6 +116,8 @@ namespace EndfieldCalculator
             catch { }
         }
 
+        // Update these methods in DamageCalculatorForm.BuildTab.cs:
+
         private BuildProfile GetCurrentProfile()
         {
             return new BuildProfile
@@ -140,7 +142,11 @@ namespace EndfieldCalculator
                 SourceStoneArtistry = nudSourceStoneArtistry.Value,
                 ElementalBonus = nudElementalBonus.Value,
                 SkillBonus = nudSkillBonus.Value,
-                UnbalanceBonus = nudUnbalanceBonus.Value,
+
+                // CHANGED: Save staggered state instead of unbalance bonus
+                IsStaggered = chkStaggered.Checked,
+                UnbalanceBonus = 0, // Keep at 0 for compatibility
+
                 OtherBonus = nudOtherBonus.Value,
                 TargetDefense = nudTargetDefense.Value,
                 TargetResistance = nudTargetResistance.Value,
@@ -190,7 +196,17 @@ namespace EndfieldCalculator
             nudSourceStoneArtistry.Value = p.SourceStoneArtistry;
             nudElementalBonus.Value = p.ElementalBonus;
             nudSkillBonus.Value = p.SkillBonus;
-            nudUnbalanceBonus.Value = p.UnbalanceBonus;
+
+           
+            if (p.UnbalanceBonus > 0)
+            {
+                chkStaggered.Checked = true;
+            }
+            else
+            {
+                chkStaggered.Checked = p.IsStaggered;
+            }
+
             nudOtherBonus.Value = p.OtherBonus;
             nudTargetDefense.Value = p.TargetDefense;
             nudTargetResistance.Value = p.TargetResistance;
