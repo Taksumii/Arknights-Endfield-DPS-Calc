@@ -145,7 +145,7 @@ namespace EndfieldCalculator
             double actualCritZone = forceCritical ? result.CritZone : 1.0;
 
             result.DamageBonus = 1.0 + (elementalBonus + skillBonus + otherBonus) / 100;
-            result.VulnerabilityZone = 1.0 + vulnerability + unbalanceBonus / 100;
+            result.VulnerabilityZone = 1.0 + vulnerability / 100;
             result.AmplificationZone = 1.0 + amplification / 100;
             result.SanctuaryZone = 1.0 - sanctuary / 100;
             result.FragilityZone = 1.0 + fragility / 100;
@@ -153,7 +153,7 @@ namespace EndfieldCalculator
             result.SpecialZone = 1.0 + specialMultiplier / 100;
 
             result.DefenseZone = CalculateDefenseZone(targetDefense, isTrueDamage);
-            result.UnbalancedZone = isUnbalanced ? 1.3 : 1.0;
+            result.UnbalancedZone = 1.0 + unbalanceBonus / 100; // VULNERABLE
             result.ResistanceZone = 1.0 - targetResistance / 100;
 
             result.AnomalyMultiplier = CalculateAnomalyMultiplier(anomalyType, anomalyLevel);
