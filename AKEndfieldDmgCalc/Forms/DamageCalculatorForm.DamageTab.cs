@@ -121,16 +121,7 @@ namespace EndfieldCalculator
                 CreateNumericWithLabel("Skill Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudSkillBonus, 2),
                 CreateNumericWithLabel("Other Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudOtherBonus, 2)
             );
-
-            
-            chkStaggered = new CheckBox
-            {
-                Text = "Target is Staggered (+30% DMG)",
-                Location = new Point(10, innerY),
-                Width = 300,
-                Font = new Font("Arial", 9, FontStyle.Bold),
-                ForeColor = Color.DarkOrange
-            };
+    
             bonusesSection.AddControl(chkStaggered);
             innerY += 30;
 
@@ -241,7 +232,16 @@ namespace EndfieldCalculator
                 CreateNumericWithLabel("Sanctuary %:", rightCol + 10, ref innerY, 0, 100, 0, out nudSanctuary, 2),
                 CreateNumericWithLabel("Fragility %:", rightCol + 10, ref innerY, 0, 200, 0, out nudFragility, 2),
                 CreateNumericWithLabel("Damage Reduction %:", rightCol + 10, ref innerY, 0, 100, 0, out nudDamageReduction, 2),
-                CreateNumericWithLabel("Special Multiplier %:", rightCol + 10, ref innerY, 0, 200, 0, out nudSpecialMultiplier, 2)
+                CreateNumericWithLabel("Special Multiplier %:", rightCol + 10, ref innerY, 0, 200, 0, out nudSpecialMultiplier, 2),
+
+               chkStaggered = new CheckBox
+               {
+                   Text = "Target is Staggered (+30% DMG)",
+                   Location = new Point(10, innerY),
+                   Width = 300,
+                   Font = new Font("Arial", 9, FontStyle.Bold),
+                   ForeColor = Color.DarkOrange
+               }
             );
             sectionManagerRight.AddSection(multipliersSection);
 
