@@ -31,6 +31,7 @@ namespace EndfieldCalculator
             public double UnbalancedZone { get; set; }
             public double SpecialZone { get; set; }
             public double DamageReductionZone { get; set; }
+            public double StaggeredZone { get; set; }
         }
 
 
@@ -47,7 +48,7 @@ namespace EndfieldCalculator
             double statBonus = primaryStat * 0.005 + secondaryStat * 0.002;
             double finalAtk = (baseAttack + weaponAttack) * (1 + attackPercent / 100) + attackFlat;
             finalAtk *= 1 + statBonus;
-            return finalAtk; 
+            return finalAtk;
         }
 
 
@@ -111,7 +112,7 @@ namespace EndfieldCalculator
         }
 
 
-       
+
 
         public static DamageResult Calculate(
             // Attacker Stats
@@ -119,9 +120,9 @@ namespace EndfieldCalculator
             double primaryStat, double secondaryStat, double damageMultiplier,
             double critRate, double critDamage, double level, double sourceStoneArtistry,
             // Bonuses
-            double elementalBonus, double skillBonus, double unbalanceBonus, double otherBonus,
+            double elementalBonus, double skillBonus, double staggeredDamageBonus, double otherBonus,
             // Target
-            double targetDefense, double targetResistance, bool isUnbalanced, bool isTrueDamage,
+            double targetDefense, double targetResistance, bool isStaggered, bool isTrueDamage,
             // Anomaly
             string anomalyType, int anomalyLevel,
             // Multipliers
@@ -144,7 +145,12 @@ namespace EndfieldCalculator
             result.CritZone = 1.0 + critDamage / 100;
             double actualCritZone = forceCritical ? result.CritZone : 1.0;
 
-            result.DamageBonus = 1.0 + (elementalBonus + skillBonus + otherBonus) / 100;
+            // Damage Bonus Zone: Includes elemental, skill, staggered damage bonus, and other
+            result.DamageBonus = 1.0 + (elementalBonus + skillBonus + staggeredDamageBonus + otherBonus) / 100;
+
+          
+            result.StaggeredZone = isStaggered ? 1.3 : 1.0;
+
             result.VulnerabilityZone = 1.0 + vulnerability / 100;
             result.AmplificationZone = 1.0 + amplification / 100;
             result.SanctuaryZone = 1.0 - sanctuary / 100;
@@ -153,24 +159,27 @@ namespace EndfieldCalculator
             result.SpecialZone = 1.0 + specialMultiplier / 100;
 
             result.DefenseZone = CalculateDefenseZone(targetDefense, isTrueDamage);
-            result.UnbalancedZone = 1.0 + unbalanceBonus / 100; // VULNERABLE
+
             result.ResistanceZone = 1.0 - targetResistance / 100;
 
             result.AnomalyMultiplier = CalculateAnomalyMultiplier(anomalyType, anomalyLevel);
             result.SpellLevelZone = CalculateSpellLevelZone(anomalyType, level);
             result.StoneZone = 1.0 + sourceStoneArtistry / 100;
 
+         
+            result.UnbalancedZone = result.StaggeredZone;
+
             // Calculate min damage (non-crit)
             double preDmgMin = baseDmg * result.AnomalyMultiplier * nonCritZone * result.DamageBonus *
                               result.DamageReductionZone * result.VulnerabilityZone * result.AmplificationZone *
-                              result.SanctuaryZone * result.FragilityZone * result.UnbalancedZone *
+                              result.SanctuaryZone * result.FragilityZone * result.StaggeredZone *
                               result.SpecialZone * result.SpellLevelZone * result.StoneZone;
             result.MinDamage = preDmgMin * result.DefenseZone * result.ResistanceZone;
 
             // Calculate max damage (crit)
             double preDmgMax = baseDmg * result.AnomalyMultiplier * result.CritZone * result.DamageBonus *
                               result.DamageReductionZone * result.VulnerabilityZone * result.AmplificationZone *
-                              result.SanctuaryZone * result.FragilityZone * result.UnbalancedZone *
+                              result.SanctuaryZone * result.FragilityZone * result.StaggeredZone *
                               result.SpecialZone * result.SpellLevelZone * result.StoneZone;
             result.MaxDamage = preDmgMax * result.DefenseZone * result.ResistanceZone;
 
@@ -181,7 +190,7 @@ namespace EndfieldCalculator
             // Current damage
             double preDmg = baseDmg * result.AnomalyMultiplier * actualCritZone * result.DamageBonus *
                            result.DamageReductionZone * result.VulnerabilityZone * result.AmplificationZone *
-                           result.SanctuaryZone * result.FragilityZone * result.UnbalancedZone *
+                           result.SanctuaryZone * result.FragilityZone * result.StaggeredZone *
                            result.SpecialZone * result.SpellLevelZone * result.StoneZone;
             result.BaseDamage = preDmg;
             result.FinalDamage = preDmg * result.DefenseZone * result.ResistanceZone;
@@ -202,7 +211,7 @@ namespace EndfieldCalculator
               Damage Bonus: ×{result.DamageBonus:F2} | Spell Level: ×{result.SpellLevelZone:F4}
               Source Stone: ×{result.StoneZone:F2} | Vulnerability: ×{result.VulnerabilityZone:F2}
               Amplification: ×{result.AmplificationZone:F2} | Sanctuary: ×{result.SanctuaryZone:F2}
-              Fragility: ×{result.FragilityZone:F2} | Unbalanced: ×{result.UnbalancedZone:F2}
+              Fragility: ×{result.FragilityZone:F2} | Staggered: ×{result.StaggeredZone:F2}
               Special: ×{result.SpecialZone:F2} | Dmg Reduction: ×{result.DamageReductionZone:F2}
               Pre-Defense: {result.BaseDamage:F2}
             

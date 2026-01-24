@@ -172,6 +172,18 @@ namespace EndfieldCalculator
             targetSection.AddControl(chkIsTrueDamage);
             innerY += 35;
 
+            // Add Staggered checkbox here
+            chkStaggered = new CheckBox
+            {
+                Text = "Target is Staggered (×1.3 DMG)",
+                Location = new Point(10, innerY),
+                Width = 300,
+                Font = new Font("Arial", 9, FontStyle.Bold),
+                ForeColor = Color.DarkOrange
+            };
+            targetSection.AddControl(chkStaggered);
+            innerY += 30;
+
             sectionManagerRight.AddSection(targetSection);
 
             var anomalySection = new CollapsibleSection(tab, "ANOMALY", rightCol, targetSection.GetBottom() + 10, 420, Color.FromArgb(240, 255, 240), () => RepositionButtonsAndResults(tab));
@@ -223,18 +235,6 @@ namespace EndfieldCalculator
                 CreateNumericWithLabel("Damage Reduction %:", 10, ref innerY, 0, 100, 0, out nudDamageReduction, 2),
                 CreateNumericWithLabel("Special Multiplier %:", 10, ref innerY, 0, 200, 0, out nudSpecialMultiplier, 2)
             );
-
-            // Add Staggered checkbox to Multiplier Zones
-            chkStaggered = new CheckBox
-            {
-                Text = "Target is Staggered (+30% DMG)",
-                Location = new Point(10, innerY),
-                Width = 300,
-                Font = new Font("Arial", 9, FontStyle.Bold),
-                ForeColor = Color.DarkOrange
-            };
-            multipliersSection.AddControl(chkStaggered);
-            innerY += 30;
 
             sectionManagerRight.AddSection(multipliersSection);
 
@@ -501,11 +501,11 @@ namespace EndfieldCalculator
             {
                 var gearBonuses = CalculateGearBonuses();
 
-                // Staggered provides:
-                // 1. Numeric bonus from nudStaggeredBonus
-                // 2. Flat +30% from checkbox if checked
-                double baseStaggeredBonus = chkStaggered.Checked ? 30.0 : 0.0;
-                double totalStaggeredBonus = baseStaggeredBonus + (double)nudStaggeredBonus.Value;
+                
+                double staggeredDamageBonus = (double)nudStaggeredBonus.Value;
+
+                
+                bool isStaggered = chkStaggered.Checked;
 
                 var result = DamageCalculator.Calculate(
                     (double)nudBaseAttack.Value,
@@ -521,11 +521,11 @@ namespace EndfieldCalculator
                     (double)nudSourceStoneArtistry.Value,
                     (double)nudElementalBonus.Value + gearBonuses.ElementalDamageBonus,
                     (double)nudSkillBonus.Value + gearBonuses.SkillDamageBonus + gearBonuses.AllDamageBonus,
-                    totalStaggeredBonus, // Total staggered damage bonus
+                    staggeredDamageBonus, // Added to Damage Bonus Zone
                     (double)nudOtherBonus.Value,
                     (double)nudTargetDefense.Value,
                     (double)nudTargetResistance.Value,
-                    false, // isUnbalanced removed - no longer used
+                    isStaggered, // Staggered status effect (×1.3 global multiplier)
                     chkIsTrueDamage.Checked,
                     cmbAnomalyType.SelectedItem?.ToString() ?? "None",
                     (int)nudAnomalyLevel.Value,
@@ -570,19 +570,18 @@ namespace EndfieldCalculator
                 statInfo += $"  Primary: {nudPrimaryStat.Value:F2} ({cmbPrimaryStatType.SelectedItem})\n";
                 statInfo += $"  Secondary: {nudSecondaryStat.Value:F2} ({cmbSecondaryStatType.SelectedItem})\n";
 
-                // Add staggered info
-                if (chkStaggered.Checked || nudStaggeredBonus.Value > 0)
+                // Add staggered info with clear separation
+                string staggeredInfo = "";
+                if (isStaggered || staggeredDamageBonus > 0)
                 {
-                    statInfo += $"\nStaggered Bonuses:\n";
-                    if (chkStaggered.Checked)
-                        statInfo += $"  Target is Staggered: +30% DMG\n";
-                    if (nudStaggeredBonus.Value > 0)
-                        statInfo += $"  Staggered Damage Bonus: +{nudStaggeredBonus.Value:F2}%\n";
-                    if (chkStaggered.Checked || nudStaggeredBonus.Value > 0)
-                        statInfo += $"  Total Staggered Bonus: +{totalStaggeredBonus:F2}%\n";
+                    staggeredInfo = $"\nStaggered Effects:\n";
+                    if (isStaggered)
+                        staggeredInfo += $"  ✓ Target is Staggered: ×1.3 Global Multiplier\n";
+                    if (staggeredDamageBonus > 0)
+                        staggeredInfo += $"  ✓ Staggered Damage Bonus: +{staggeredDamageBonus:F2}% (added to Damage Bonus Zone)\n";
                 }
 
-                txtBreakdown.Text = statInfo + gearInfo + "\n" + result.Breakdown;
+                txtBreakdown.Text = statInfo + gearInfo + staggeredInfo + "\n" + result.Breakdown;
             }
             catch (Exception ex)
             {

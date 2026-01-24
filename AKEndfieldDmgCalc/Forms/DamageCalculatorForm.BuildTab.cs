@@ -10,9 +10,6 @@ using AKEndfieldDmgCalc.Calculators;
 
 namespace EndfieldCalculator
 {
-
-    
-
     public partial class DamageCalculatorForm
     {
         private void InitializeBuildTab(TabPage tab)
@@ -116,11 +113,6 @@ namespace EndfieldCalculator
             catch { }
         }
 
-
-
-
-        // Replace GetCurrentProfile and LoadProfile in DamageCalculatorForm.BuildTab.cs:
-
         private BuildProfile GetCurrentProfile()
         {
             return new BuildProfile
@@ -146,20 +138,18 @@ namespace EndfieldCalculator
                 ElementalBonus = nudElementalBonus.Value,
                 SkillBonus = nudSkillBonus.Value,
 
-                // Staggered system
-                StaggeredBonus = nudStaggeredBonus.Value, // Staggered Damage Bonus %
-                IsStaggered = chkStaggered.Checked,       // Target is Staggered toggle
-                UnbalanceBonus = 0, // Keep at 0 for compatibility
+           
+                StaggeredBonus = nudStaggeredBonus.Value,  
+                IsStaggered = chkStaggered.Checked,        
+
+             
+                UnbalanceBonus = 0,
+                IsUnbalanced = chkStaggered.Checked,
 
                 OtherBonus = nudOtherBonus.Value,
                 TargetDefense = nudTargetDefense.Value,
                 TargetResistance = nudTargetResistance.Value,
                 DamageType = cmbDamageType.SelectedItem?.ToString() ?? "Physical",
-
-                // Save staggered checkbox state to both fields for compatibility
-                IsUnbalanced = chkStaggered.Checked,
-             
-
                 IsCritical = chkIsCritical.Checked,
                 IsTrueDamage = chkIsTrueDamage.Checked,
                 AnomalyType = cmbAnomalyType.SelectedItem?.ToString() ?? "None",
@@ -205,17 +195,15 @@ namespace EndfieldCalculator
             nudElementalBonus.Value = p.ElementalBonus;
             nudSkillBonus.Value = p.SkillBonus;
 
-           
+            // Load staggered values
             nudStaggeredBonus.Value = p.StaggeredBonus;
+            chkStaggered.Checked = p.IsStaggered;
 
-      
+           
             if (p.UnbalanceBonus > 0)
             {
-                chkStaggered.Checked = true;
-            }
-            else
-            {
-                chkStaggered.Checked = p.IsStaggered;
+                
+                chkStaggered.Checked = p.IsUnbalanced;
             }
 
             nudOtherBonus.Value = p.OtherBonus;
@@ -230,8 +218,6 @@ namespace EndfieldCalculator
 
             int idx2 = cmbDamageType.Items.IndexOf(p.DamageType);
             cmbDamageType.SelectedIndex = idx2 >= 0 ? idx2 : 0;
-
-            chkStaggered.Checked = p.IsStaggered || p.IsUnbalanced;
 
             chkIsCritical.Checked = p.IsCritical;
             chkIsTrueDamage.Checked = p.IsTrueDamage;
@@ -273,7 +259,6 @@ namespace EndfieldCalculator
             {
                 if (lstBuilds.SelectedIndex < 0)
                 {
-                    
                     lstBuilds.Tag = null;
                     return;
                 }
@@ -298,7 +283,6 @@ namespace EndfieldCalculator
                         lblBuildInfo.Text = $"Build: {name}\nLast Modified: {fileInfo.LastWriteTime:g}\nSize: {fileInfo.Length} bytes{statInfo}";
                         txtBuildNotes.Text = profile.Notes ?? "";
 
-                        
                         lstBuilds.Tag = null;
                     }
                 }
@@ -311,16 +295,9 @@ namespace EndfieldCalculator
             string name = InputDialog.Show("Enter build name:", "New Build");
             if (!string.IsNullOrWhiteSpace(name))
             {
-                
                 lstBuilds.SelectedIndex = -1;
-
-             
                 txtBuildNotes.Text = "";
-
-                
                 lblBuildInfo.Text = $"New Build: {name}\nNot yet saved.\n\nClick 'Save' to create this build.";
-
-                
                 lstBuilds.Tag = name;
             }
         }
@@ -331,18 +308,15 @@ namespace EndfieldCalculator
             {
                 string name = null;
 
-                
                 if (lstBuilds.Tag is string newBuildName && !string.IsNullOrWhiteSpace(newBuildName))
                 {
                     name = newBuildName;
                 }
-         
                 else if (lstBuilds.SelectedIndex >= 0)
                 {
                     name = lstBuilds.SelectedItem?.ToString();
                 }
 
-                
                 if (string.IsNullOrWhiteSpace(name))
                 {
                     name = InputDialog.Show("Enter build name:", "Save Build");
@@ -357,7 +331,6 @@ namespace EndfieldCalculator
                 File.WriteAllText(path, JsonSerializer.Serialize(profile,
                     new JsonSerializerOptions { WriteIndented = true }));
 
-                // Clear the temporary new build name
                 lstBuilds.Tag = null;
 
                 MessageBox.Show($"Saved '{name}'!", "Success");
