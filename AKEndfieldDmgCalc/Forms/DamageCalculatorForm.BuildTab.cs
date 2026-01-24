@@ -116,7 +116,10 @@ namespace EndfieldCalculator
             catch { }
         }
 
-        // Update these methods in DamageCalculatorForm.BuildTab.cs:
+
+
+
+        // Replace GetCurrentProfile and LoadProfile in DamageCalculatorForm.BuildTab.cs:
 
         private BuildProfile GetCurrentProfile()
         {
@@ -143,15 +146,20 @@ namespace EndfieldCalculator
                 ElementalBonus = nudElementalBonus.Value,
                 SkillBonus = nudSkillBonus.Value,
 
-                // CHANGED: Save staggered state instead of unbalance bonus
-                IsStaggered = chkStaggered.Checked,
+                // Staggered system
+                StaggeredBonus = nudStaggeredBonus.Value, // Staggered Damage Bonus %
+                IsStaggered = chkStaggered.Checked,       // Target is Staggered toggle
                 UnbalanceBonus = 0, // Keep at 0 for compatibility
 
                 OtherBonus = nudOtherBonus.Value,
                 TargetDefense = nudTargetDefense.Value,
                 TargetResistance = nudTargetResistance.Value,
                 DamageType = cmbDamageType.SelectedItem?.ToString() ?? "Physical",
-                IsUnbalanced = chkIsUnbalanced.Checked,
+
+                // Save staggered checkbox state to both fields for compatibility
+                IsUnbalanced = chkStaggered.Checked,
+             
+
                 IsCritical = chkIsCritical.Checked,
                 IsTrueDamage = chkIsTrueDamage.Checked,
                 AnomalyType = cmbAnomalyType.SelectedItem?.ToString() ?? "None",
@@ -198,6 +206,9 @@ namespace EndfieldCalculator
             nudSkillBonus.Value = p.SkillBonus;
 
            
+            nudStaggeredBonus.Value = p.StaggeredBonus;
+
+      
             if (p.UnbalanceBonus > 0)
             {
                 chkStaggered.Checked = true;
@@ -220,7 +231,8 @@ namespace EndfieldCalculator
             int idx2 = cmbDamageType.Items.IndexOf(p.DamageType);
             cmbDamageType.SelectedIndex = idx2 >= 0 ? idx2 : 0;
 
-            chkIsUnbalanced.Checked = p.IsUnbalanced;
+            chkStaggered.Checked = p.IsStaggered || p.IsUnbalanced;
+
             chkIsCritical.Checked = p.IsCritical;
             chkIsTrueDamage.Checked = p.IsTrueDamage;
 

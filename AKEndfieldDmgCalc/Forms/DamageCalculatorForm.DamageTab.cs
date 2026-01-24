@@ -17,8 +17,9 @@ namespace EndfieldCalculator
         private ComboBox cmbPrimaryStatType;
         private ComboBox cmbSecondaryStatType;
 
-        // Add new checkbox for Staggered
+        // Staggered controls
         private CheckBox chkStaggered;
+        private NumericUpDown nudStaggeredBonus;
 
         private void InitializeDamageTab(TabPage tab)
         {
@@ -119,11 +120,9 @@ namespace EndfieldCalculator
             bonusesSection.AddControls(
                 CreateNumericWithLabel("Elemental Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudElementalBonus, 2),
                 CreateNumericWithLabel("Skill Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudSkillBonus, 2),
+                CreateNumericWithLabel("Staggered Damage Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudStaggeredBonus, 2),
                 CreateNumericWithLabel("Other Bonus %:", leftCol + 10, ref innerY, 0, 500, 0, out nudOtherBonus, 2)
             );
-    
-            bonusesSection.AddControl(chkStaggered);
-            innerY += 30;
 
             sectionManagerLeft.AddSection(bonusesSection);
 
@@ -137,10 +136,10 @@ namespace EndfieldCalculator
             targetSection.AddControl(CreateNumericWithLabel("Target Resistance:", rightCol + 10, ref innerY, 0, 100, 20, out nudTargetResistance, 2));
 
             // Damage Type dropdown
-            var lblDmgType = new Label { Text = "Damage Type:", Location = new Point(rightCol + 10, innerY), AutoSize = true, Font = new Font("Arial", 9) };
+            var lblDmgType = new Label { Text = "Damage Type:", Location = new Point(10, innerY), AutoSize = true, Font = new Font("Arial", 9) };
             cmbDamageType = new ComboBox
             {
-                Location = new Point(rightCol + 190, innerY - 3),
+                Location = new Point(180, innerY - 3),
                 Width = 200,
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Font = new Font("Arial", 9)
@@ -153,20 +152,10 @@ namespace EndfieldCalculator
             targetSection.AddControl(cmbDamageType);
             innerY += 35;
 
-            chkIsUnbalanced = new CheckBox
-            {
-                Text = "Target is Unbalanced (1.3x)",
-                Location = new Point(rightCol + 10, innerY),
-                Width = 280,
-                Font = new Font("Arial", 9)
-            };
-            targetSection.AddControl(chkIsUnbalanced);
-            innerY += 30;
-
             chkIsCritical = new CheckBox
             {
                 Text = "Force Critical Hit",
-                Location = new Point(rightCol + 10, innerY),
+                Location = new Point(10, innerY),
                 Width = 200,
                 Font = new Font("Arial", 9)
             };
@@ -176,7 +165,7 @@ namespace EndfieldCalculator
             chkIsTrueDamage = new CheckBox
             {
                 Text = "True Damage",
-                Location = new Point(rightCol + 10, innerY),
+                Location = new Point(10, innerY),
                 Width = 200,
                 Font = new Font("Arial", 9)
             };
@@ -188,10 +177,10 @@ namespace EndfieldCalculator
             var anomalySection = new CollapsibleSection(tab, "ANOMALY", rightCol, targetSection.GetBottom() + 10, 420, Color.FromArgb(240, 255, 240), () => RepositionButtonsAndResults(tab));
             innerY = 10;
 
-            var lblAnomType = new Label { Text = "Anomaly Type:", Location = new Point(rightCol + 10, innerY), AutoSize = true, Font = new Font("Arial", 9) };
+            var lblAnomType = new Label { Text = "Anomaly Type:", Location = new Point(10, innerY), AutoSize = true, Font = new Font("Arial", 9) };
             cmbAnomalyType = new ComboBox
             {
-                Location = new Point(rightCol + 190, innerY - 3),
+                Location = new Point(180, innerY - 3),
                 Width = 200,
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Font = new Font("Arial", 9)
@@ -214,7 +203,7 @@ namespace EndfieldCalculator
             anomalySection.AddControl(cmbAnomalyType);
             innerY += 35;
 
-            anomalySection.AddControl(CreateNumericWithLabel("Anomaly Level (1-4):", rightCol + 10, ref innerY, 1, 4, 1, out nudAnomalyLevel));
+            anomalySection.AddControl(CreateNumericWithLabel("Anomaly Level (1-4):", 10, ref innerY, 1, 4, 1, out nudAnomalyLevel));
 
 
             nudLevel = new NumericUpDown { Minimum = 1, Maximum = 99, Value = 99, Visible = false };
@@ -227,22 +216,26 @@ namespace EndfieldCalculator
             innerY = 10;
 
             multipliersSection.AddControls(
-                CreateNumericWithLabel("Vulnerability %:", rightCol + 10, ref innerY, 0, 200, 0, out nudVulnerability, 2),
-                CreateNumericWithLabel("Amplification %:", rightCol + 10, ref innerY, 0, 200, 0, out nudAmplification, 2),
-                CreateNumericWithLabel("Sanctuary %:", rightCol + 10, ref innerY, 0, 100, 0, out nudSanctuary, 2),
-                CreateNumericWithLabel("Fragility %:", rightCol + 10, ref innerY, 0, 200, 0, out nudFragility, 2),
-                CreateNumericWithLabel("Damage Reduction %:", rightCol + 10, ref innerY, 0, 100, 0, out nudDamageReduction, 2),
-                CreateNumericWithLabel("Special Multiplier %:", rightCol + 10, ref innerY, 0, 200, 0, out nudSpecialMultiplier, 2),
-
-               chkStaggered = new CheckBox
-               {
-                   Text = "Target is Staggered (+30% DMG)",
-                   Location = new Point(10, innerY),
-                   Width = 300,
-                   Font = new Font("Arial", 9, FontStyle.Bold),
-                   ForeColor = Color.DarkOrange
-               }
+                CreateNumericWithLabel("Vulnerability %:", 10, ref innerY, 0, 200, 0, out nudVulnerability, 2),
+                CreateNumericWithLabel("Amplification %:", 10, ref innerY, 0, 200, 0, out nudAmplification, 2),
+                CreateNumericWithLabel("Sanctuary %:", 10, ref innerY, 0, 100, 0, out nudSanctuary, 2),
+                CreateNumericWithLabel("Fragility %:", 10, ref innerY, 0, 200, 0, out nudFragility, 2),
+                CreateNumericWithLabel("Damage Reduction %:", 10, ref innerY, 0, 100, 0, out nudDamageReduction, 2),
+                CreateNumericWithLabel("Special Multiplier %:", 10, ref innerY, 0, 200, 0, out nudSpecialMultiplier, 2)
             );
+
+            // Add Staggered checkbox to Multiplier Zones
+            chkStaggered = new CheckBox
+            {
+                Text = "Target is Staggered (+30% DMG)",
+                Location = new Point(10, innerY),
+                Width = 300,
+                Font = new Font("Arial", 9, FontStyle.Bold),
+                ForeColor = Color.DarkOrange
+            };
+            multipliersSection.AddControl(chkStaggered);
+            innerY += 30;
+
             sectionManagerRight.AddSection(multipliersSection);
 
 
@@ -508,8 +501,11 @@ namespace EndfieldCalculator
             {
                 var gearBonuses = CalculateGearBonuses();
 
-                // Calculate staggered bonus - flat 30% if checked
-                double staggeredBonus = chkStaggered.Checked ? 30.0 : 0.0;
+                // Staggered provides:
+                // 1. Numeric bonus from nudStaggeredBonus
+                // 2. Flat +30% from checkbox if checked
+                double baseStaggeredBonus = chkStaggered.Checked ? 30.0 : 0.0;
+                double totalStaggeredBonus = baseStaggeredBonus + (double)nudStaggeredBonus.Value;
 
                 var result = DamageCalculator.Calculate(
                     (double)nudBaseAttack.Value,
@@ -525,11 +521,11 @@ namespace EndfieldCalculator
                     (double)nudSourceStoneArtistry.Value,
                     (double)nudElementalBonus.Value + gearBonuses.ElementalDamageBonus,
                     (double)nudSkillBonus.Value + gearBonuses.SkillDamageBonus + gearBonuses.AllDamageBonus,
-                    staggeredBonus, // Pass staggered bonus here
+                    totalStaggeredBonus, // Total staggered damage bonus
                     (double)nudOtherBonus.Value,
                     (double)nudTargetDefense.Value,
                     (double)nudTargetResistance.Value,
-                    chkIsUnbalanced.Checked,
+                    false, // isUnbalanced removed - no longer used
                     chkIsTrueDamage.Checked,
                     cmbAnomalyType.SelectedItem?.ToString() ?? "None",
                     (int)nudAnomalyLevel.Value,
@@ -575,9 +571,15 @@ namespace EndfieldCalculator
                 statInfo += $"  Secondary: {nudSecondaryStat.Value:F2} ({cmbSecondaryStatType.SelectedItem})\n";
 
                 // Add staggered info
-                if (chkStaggered.Checked)
+                if (chkStaggered.Checked || nudStaggeredBonus.Value > 0)
                 {
-                    statInfo += $"  Target is Staggered: +30% DMG\n";
+                    statInfo += $"\nStaggered Bonuses:\n";
+                    if (chkStaggered.Checked)
+                        statInfo += $"  Target is Staggered: +30% DMG\n";
+                    if (nudStaggeredBonus.Value > 0)
+                        statInfo += $"  Staggered Damage Bonus: +{nudStaggeredBonus.Value:F2}%\n";
+                    if (chkStaggered.Checked || nudStaggeredBonus.Value > 0)
+                        statInfo += $"  Total Staggered Bonus: +{totalStaggeredBonus:F2}%\n";
                 }
 
                 txtBreakdown.Text = statInfo + gearInfo + "\n" + result.Breakdown;
