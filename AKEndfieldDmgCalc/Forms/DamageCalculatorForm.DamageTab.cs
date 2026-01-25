@@ -1,9 +1,10 @@
-﻿using System;
-using System.Windows.Forms;
-using System.Drawing;
-using AKEndfieldDmgCalc.Calculators;
+﻿using AKEndfieldDmgCalc.Calculators;
 using AKEndfieldDmgCalc.Data;
 using AKEndfieldDmgCalc.Helpers;
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EndfieldCalculator
 {
@@ -95,8 +96,8 @@ namespace EndfieldCalculator
             int innerY = 10;
 
             attackerSection.AddControls(
-                CreateNumericWithLabel("Operator Base Attack:", leftCol + 10, ref innerY, 0, 10000, 100, out nudBaseAttack),
-                CreateNumericWithLabel("Weapon Base Attack:", leftCol + 10, ref innerY, 0, 10000, 50, out nudWeaponAttack),
+                CreateNumericWithLabel("Operator Base Attack:", leftCol + 10, ref innerY, 0, 10000, 100, out nudBaseAttack, 2),
+                CreateNumericWithLabel("Weapon Base Attack:", leftCol + 10, ref innerY, 0, 10000, 50, out nudWeaponAttack, 2),
                 CreateNumericWithLabel("Attack % Bonus:", leftCol + 10, ref innerY, 0, 500, 0, out nudAttackPercent, 2),
                 CreateNumericWithLabel("Attack Flat Bonus:", leftCol + 10, ref innerY, 0, 5000, 0, out nudAttackFlat, 2)
             );
@@ -263,7 +264,12 @@ namespace EndfieldCalculator
             pnlResults.Controls.Add(lblFinalAtk);
             pnlResults.Controls.Add(txtFinalAttack);
 
-            var lblBaseDmg = new Label { Text = "Base Damage:", Location = new Point(0, 40), AutoSize = true, Font = new Font("Arial", 9) };
+            var lblBaseDmg = new Label
+            {
+                Text = "Base Damage:",
+                Location = new Point(0, 40),
+                AutoSize = true,
+                Font = new Font("Arial", 9) };
             txtBaseDamage = new TextBox
             {
                 Location = new Point(180, 35),
@@ -272,128 +278,128 @@ namespace EndfieldCalculator
                 BackColor = Color.LightYellow,
                 Font = new Font("Arial", 10, FontStyle.Bold)
             };
-            pnlResults.Controls.Add(lblBaseDmg);
-            pnlResults.Controls.Add(txtBaseDamage);
+                pnlResults.Controls.Add(lblBaseDmg);
+                pnlResults.Controls.Add(txtBaseDamage);
 
-            var lblFinalDmg = new Label { Text = "Final Damage:", Location = new Point(0, 75), AutoSize = true, Font = new Font("Arial", 9) };
-            txtFinalDamage = new TextBox
-            {
-                Location = new Point(180, 70),
-                Width = 180,
-                ReadOnly = true,
-                BackColor = Color.LightYellow,
-                Font = new Font("Arial", 10, FontStyle.Bold)
-            };
-            pnlResults.Controls.Add(lblFinalDmg);
-            pnlResults.Controls.Add(txtFinalDamage);
+                var lblFinalDmg = new Label { Text = "Final Damage:", Location = new Point(0, 75), AutoSize = true, Font = new Font("Arial", 9) };
+                txtFinalDamage = new TextBox
+                {
+                    Location = new Point(180, 70),
+                    Width = 180,
+                    ReadOnly = true,
+                    BackColor = Color.LightYellow,
+                    Font = new Font("Arial", 10, FontStyle.Bold)
+                };
+                pnlResults.Controls.Add(lblFinalDmg);
+                pnlResults.Controls.Add(txtFinalDamage);
 
-            resultsSection.AddControl(pnlResults);
+                resultsSection.AddControl(pnlResults);
 
-            var rangeSection = new CollapsibleSection(tab, "DAMAGE RANGE", leftCol, bonusesSection.GetBottom() + 20, 420, Color.FromArgb(255, 240, 255));
-            int rangeInnerY = 10;
+                var rangeSection = new CollapsibleSection(tab, "DAMAGE RANGE", leftCol, bonusesSection.GetBottom() + 20, 420, Color.FromArgb(255, 240, 255));
+                int rangeInnerY = 10;
 
-            var pnlRange = new Panel
-            {
-                Location = new Point(10, rangeInnerY),
-                Size = new Size(400, 155),
-                BackColor = Color.White,
-                BorderStyle = BorderStyle.None
-            };
+                var pnlRange = new Panel
+                {
+                    Location = new Point(10, rangeInnerY),
+                    Size = new Size(400, 155),
+                    BackColor = Color.White,
+                    BorderStyle = BorderStyle.None
+                };
 
-            var lblMinDmg = new Label { Text = "Min (Non-Crit):", Location = new Point(0, 5), AutoSize = true, Font = new Font("Arial", 9) };
-            txtMinDamage = new TextBox
-            {
-                Location = new Point(180, 0),
-                Width = 180,
-                ReadOnly = true,
-                BackColor = Color.FromArgb(255, 235, 235),
-                Font = new Font("Arial", 10, FontStyle.Bold)
-            };
-            pnlRange.Controls.Add(lblMinDmg);
-            pnlRange.Controls.Add(txtMinDamage);
+                var lblMinDmg = new Label { Text = "Min (Non-Crit):", Location = new Point(0, 5), AutoSize = true, Font = new Font("Arial", 9) };
+                txtMinDamage = new TextBox
+                {
+                    Location = new Point(180, 0),
+                    Width = 180,
+                    ReadOnly = true,
+                    BackColor = Color.FromArgb(255, 235, 235),
+                    Font = new Font("Arial", 10, FontStyle.Bold)
+                };
+                pnlRange.Controls.Add(lblMinDmg);
+                pnlRange.Controls.Add(txtMinDamage);
 
-            var lblMaxDmg = new Label { Text = "Max (Crit):", Location = new Point(0, 40), AutoSize = true, Font = new Font("Arial", 9) };
-            txtMaxDamage = new TextBox
-            {
-                Location = new Point(180, 35),
-                Width = 180,
-                ReadOnly = true,
-                BackColor = Color.FromArgb(235, 255, 235),
-                Font = new Font("Arial", 10, FontStyle.Bold)
-            };
-            pnlRange.Controls.Add(lblMaxDmg);
-            pnlRange.Controls.Add(txtMaxDamage);
+                var lblMaxDmg = new Label { Text = "Max (Crit):", Location = new Point(0, 40), AutoSize = true, Font = new Font("Arial", 9) };
+                txtMaxDamage = new TextBox
+                {
+                    Location = new Point(180, 35),
+                    Width = 180,
+                    ReadOnly = true,
+                    BackColor = Color.FromArgb(235, 255, 235),
+                    Font = new Font("Arial", 10, FontStyle.Bold)
+                };
+                pnlRange.Controls.Add(lblMaxDmg);
+                pnlRange.Controls.Add(txtMaxDamage);
 
-            var lblAvgDmg = new Label { Text = "Average:", Location = new Point(0, 75), AutoSize = true, Font = new Font("Arial", 9) };
-            txtAvgDamage = new TextBox
-            {
-                Location = new Point(180, 70),
-                Width = 180,
-                ReadOnly = true,
-                BackColor = Color.FromArgb(235, 235, 255),
-                Font = new Font("Arial", 10, FontStyle.Bold)
-            };
-            pnlRange.Controls.Add(lblAvgDmg);
-            pnlRange.Controls.Add(txtAvgDamage);
+                var lblAvgDmg = new Label { Text = "Average:", Location = new Point(0, 75), AutoSize = true, Font = new Font("Arial", 9) };
+                txtAvgDamage = new TextBox
+                {
+                    Location = new Point(180, 70),
+                    Width = 180,
+                    ReadOnly = true,
+                    BackColor = Color.FromArgb(235, 235, 255),
+                    Font = new Font("Arial", 10, FontStyle.Bold)
+                };
+                pnlRange.Controls.Add(lblAvgDmg);
+                pnlRange.Controls.Add(txtAvgDamage);
 
-            var lblCritChance = new Label { Text = "Crit Chance:", Location = new Point(0, 110), AutoSize = true, Font = new Font("Arial", 9) };
-            txtCritChance = new TextBox
-            {
-                Location = new Point(180, 105),
-                Width = 180,
-                ReadOnly = true,
-                BackColor = Color.FromArgb(255, 255, 235),
-                Font = new Font("Arial", 10, FontStyle.Bold)
-            };
-            pnlRange.Controls.Add(lblCritChance);
-            pnlRange.Controls.Add(txtCritChance);
+                var lblCritChance = new Label { Text = "Crit Chance:", Location = new Point(0, 110), AutoSize = true, Font = new Font("Arial", 9) };
+                txtCritChance = new TextBox
+                {
+                    Location = new Point(180, 105),
+                    Width = 180,
+                    ReadOnly = true,
+                    BackColor = Color.FromArgb(255, 255, 235),
+                    Font = new Font("Arial", 10, FontStyle.Bold)
+                };
+                pnlRange.Controls.Add(lblCritChance);
+                pnlRange.Controls.Add(txtCritChance);
 
-            rangeSection.AddControl(pnlRange);
+                rangeSection.AddControl(pnlRange);
 
 
-            int initialBreakdownY = Math.Max(rangeSection.GetBottom(), resultsSection.GetBottom()) + 20;
-            var lblBreakdown = new Label
-            {
-                Text = "Breakdown:",
-                Location = new Point(leftCol, initialBreakdownY),
-                AutoSize = true,
-                Font = new Font("Arial", 9, FontStyle.Bold)
-            };
-            lblBreakdown.Name = "lblBreakdown";
-            tab.Controls.Add(lblBreakdown);
+                int initialBreakdownY = Math.Max(rangeSection.GetBottom(), resultsSection.GetBottom()) + 20;
+                var lblBreakdown = new Label
+                {
+                    Text = "Breakdown:",
+                    Location = new Point(leftCol, initialBreakdownY),
+                    AutoSize = true,
+                    Font = new Font("Arial", 9, FontStyle.Bold)
+                };
+                lblBreakdown.Name = "lblBreakdown";
+                tab.Controls.Add(lblBreakdown);
 
-            txtBreakdown = new TextBox
-            {
-                Location = new Point(leftCol, initialBreakdownY + 25),
-                Size = new Size(870, 150),
-                Multiline = true,
-                ReadOnly = true,
-                ScrollBars = ScrollBars.Vertical,
-                Font = new Font("Consolas", 8),
-                BackColor = Color.FromArgb(250, 250, 250)
-            };
-            txtBreakdown.Name = "txtBreakdown";
-            tab.Controls.Add(txtBreakdown);
+                txtBreakdown = new TextBox
+                {
+                    Location = new Point(leftCol, initialBreakdownY + 25),
+                    Size = new Size(870, 150),
+                    Multiline = true,
+                    ReadOnly = true,
+                    ScrollBars = ScrollBars.Vertical,
+                    Font = new Font("Consolas", 8),
+                    BackColor = Color.FromArgb(250, 250, 250)
+                };
+                txtBreakdown.Name = "txtBreakdown";
+                tab.Controls.Add(txtBreakdown);
 
-            tab.Tag = new
-            {
-                btnCalculate,
-                btnExpandAll,
-                btnCollapseAll,
-                resultsSection,
-                rangeSection,
-                lblBreakdown,
-                txtBreakdown,
-                attackerSection,
-                bonusesSection,
-                targetSection,
-                anomalySection,
-                multipliersSection
-            };
+                tab.Tag = new
+                {
+                    btnCalculate,
+                    btnExpandAll,
+                    btnCollapseAll,
+                    resultsSection,
+                    rangeSection,
+                    lblBreakdown,
+                    txtBreakdown,
+                    attackerSection,
+                    bonusesSection,
+                    targetSection,
+                    anomalySection,
+                    multipliersSection
+                };
 
-            // Do initial positioning
-            RepositionButtonsAndResults(tab);
-        }
+                // Do initial positioning
+                RepositionButtonsAndResults(tab);
+            }
 
 
         private void RepositionButtonsAndResults(TabPage tab)
@@ -501,10 +507,10 @@ namespace EndfieldCalculator
             {
                 var gearBonuses = CalculateGearBonuses();
 
-                
+
                 double staggeredDamageBonus = (double)nudStaggeredBonus.Value;
 
-                
+
                 bool isStaggered = chkStaggered.Checked;
 
                 var result = DamageCalculator.Calculate(
@@ -521,7 +527,7 @@ namespace EndfieldCalculator
                     (double)nudSourceStoneArtistry.Value,
                     (double)nudElementalBonus.Value + gearBonuses.ElementalDamageBonus,
                     (double)nudSkillBonus.Value + gearBonuses.SkillDamageBonus + gearBonuses.AllDamageBonus,
-                    staggeredDamageBonus, // Added to Damage Bonus Zone
+                    staggeredDamageBonus, 
                     (double)nudOtherBonus.Value,
                     (double)nudTargetDefense.Value,
                     (double)nudTargetResistance.Value,
