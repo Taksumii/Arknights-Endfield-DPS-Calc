@@ -32,6 +32,13 @@ namespace EndfieldCalculator
             public double SpecialZone { get; set; }
             public double DamageReductionZone { get; set; }
             public double StaggeredZone { get; set; }
+
+            public sealed class DamageCalcContext
+            {
+                public DamageCalculator.DamageResult Result100 { get; init; }   // multiplier=100
+                public DamageCalculator.DamageResult ResultCurrent { get; init; } // multiplier = nudDamageMultiplier
+            }
+
         }
 
 

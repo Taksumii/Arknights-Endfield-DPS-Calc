@@ -1,16 +1,21 @@
 ﻿using AKEndfieldDmgCalc.Data;
+using AKEndfieldDmgCalc.Helpers;
 using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Windows.Forms;
+using static EndfieldCalculator.DamageCalculator.DamageResult;
 
 namespace EndfieldCalculator
 {
     public partial class DamageCalculatorForm : Form
     {
         private TabControl tabControl;
+
+        private BaselineService _baselineService;
+
 
         // Damage Calculator Tab Controls
         private NumericUpDown nudBaseAttack, nudWeaponAttack, nudAttackPercent, nudAttackFlat;
@@ -98,6 +103,123 @@ namespace EndfieldCalculator
             InitializeComparisonTab(tabComparison);
             InitializeBuildTab(tabBuilds);
         }
-     
+
+            private DamageCalculator.DamageResult CalculateFromUi(double damageMultiplierOverride, bool forceCriticalOverrideUsesUi = true)
+        {
+            var gearBonuses = CalculateGearBonuses();
+
+            double staggeredDamageBonus = (double)nudStaggeredBonus.Value;
+            bool isStaggered = chkStaggered.Checked;
+
+            return DamageCalculator.Calculate(
+                (double)nudBaseAttack.Value,
+                (double)nudWeaponAttack.Value,
+                (double)nudAttackPercent.Value + gearBonuses.AttackPercent,
+                (double)nudAttackFlat.Value + gearBonuses.AttackFlat,
+                (double)nudPrimaryStat.Value,
+                (double)nudSecondaryStat.Value,
+                damageMultiplierOverride,
+                (double)nudCritRate.Value + gearBonuses.CritRate,
+                (double)nudCritDamage.Value + gearBonuses.CritDamage,
+                (double)nudLevel.Value,
+                (double)nudSourceStoneArtistry.Value,
+                (double)nudElementalBonus.Value + gearBonuses.ElementalDamageBonus,
+                (double)nudSkillBonus.Value + gearBonuses.SkillDamageBonus + gearBonuses.AllDamageBonus,
+                staggeredDamageBonus,
+                (double)nudOtherBonus.Value,
+                (double)nudTargetDefense.Value,
+                (double)nudTargetResistance.Value,
+                isStaggered,
+                chkIsTrueDamage.Checked,
+                cmbAnomalyType.SelectedItem?.ToString() ?? "None",
+                (int)nudAnomalyLevel.Value,
+                (double)nudVulnerability.Value,
+                (double)nudAmplification.Value,
+                (double)nudSanctuary.Value,
+                (double)nudFragility.Value,
+                (double)nudDamageReduction.Value + gearBonuses.DamageReduction,
+                (double)nudSpecialMultiplier.Value,
+                forceCriticalOverrideUsesUi ? chkIsCritical.Checked : false
+            );
+        }
+
+        public DamageCalculator.DamageResult CalculateFromUiForRotation(
+                 double damageMultiplier,
+                 double elementalBonusOverride,
+                 double skillBonusOverride,
+                 double otherBonusOverride)
+        {
+            var gearBonuses = CalculateGearBonuses();
+
+            double staggeredDamageBonus = (double)nudStaggeredBonus.Value;
+            bool isStaggered = chkStaggered.Checked;
+
+            return DamageCalculator.Calculate(
+                (double)nudBaseAttack.Value,
+                (double)nudWeaponAttack.Value,
+                (double)nudAttackPercent.Value + gearBonuses.AttackPercent,
+                (double)nudAttackFlat.Value + gearBonuses.AttackFlat,
+                (double)nudPrimaryStat.Value,
+                (double)nudSecondaryStat.Value,
+                damageMultiplier,
+                (double)nudCritRate.Value + gearBonuses.CritRate,
+                (double)nudCritDamage.Value + gearBonuses.CritDamage,
+                (double)nudLevel.Value,
+                (double)nudSourceStoneArtistry.Value,
+                elementalBonusOverride,
+                skillBonusOverride,
+                staggeredDamageBonus,
+                otherBonusOverride,
+                (double)nudTargetDefense.Value,
+                (double)nudTargetResistance.Value,
+                chkStaggered.Checked,
+                chkIsTrueDamage.Checked,
+                cmbAnomalyType.SelectedItem?.ToString() ?? "None",
+                (int)nudAnomalyLevel.Value,
+                (double)nudVulnerability.Value,
+                (double)nudAmplification.Value,
+                (double)nudSanctuary.Value,
+                (double)nudFragility.Value,
+                (double)nudDamageReduction.Value + gearBonuses.DamageReduction,
+                (double)nudSpecialMultiplier.Value,
+                chkIsCritical.Checked
+            );
+        }
+
+
+        private DamageCalcContext ComputeDamageContextFromUi()
+        {
+            // 100% baseline (for rotation scaling)
+            var r100 = CalculateFromUi(100, forceCriticalOverrideUsesUi: true);
+
+            // current multiplier (what the user sees in the damage tab)
+            var rCur = CalculateFromUi((double)nudDamageMultiplier.Value, forceCriticalOverrideUsesUi: true);
+
+            return new DamageCalcContext
+            {
+                Result100 = r100,
+                ResultCurrent = rCur
+            };
+        }
+
+        private void ApplyDamageResultToUi(DamageCalculator.DamageResult result)
+        {
+            
+            txtFinalAttack.Text = result.FinalAttack.ToString("F2");
+            txtBaseDamage.Text = result.BaseDamage.ToString("F2");
+            txtFinalDamage.Text = result.FinalDamage.ToString("F2") + (chkIsCritical.Checked ? " (CRIT!)" : "");
+
+            if (txtMinDamage != null) txtMinDamage.Text = result.MinDamage.ToString("F2");
+            if (txtMaxDamage != null) txtMaxDamage.Text = result.MaxDamage.ToString("F2");
+            if (txtAvgDamage != null) txtAvgDamage.Text = result.AverageDamage.ToString("F2");
+
+            // Crit chance display (including gear)
+            var gearBonuses = CalculateGearBonuses();
+            if (txtCritChance != null) txtCritChance.Text = $"{nudCritRate.Value + (decimal)gearBonuses.CritRate:F2}%";
+
+          
+        }
+
     }
+
 }

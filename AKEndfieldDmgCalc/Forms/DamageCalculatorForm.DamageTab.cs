@@ -1,6 +1,7 @@
 ﻿using AKEndfieldDmgCalc.Calculators;
 using AKEndfieldDmgCalc.Data;
 using AKEndfieldDmgCalc.Helpers;
+using AKEndfieldDmgCalc.Models;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -71,6 +72,9 @@ namespace EndfieldCalculator
                 sectionManagerRight.ExpandAll();
                 RepositionButtonsAndResults(tab);
             };
+            _baselineService = new BaselineService((elem, skill, other) =>
+                  CalculateBaseline100WithOverrides(elem, skill, other));    // testing
+
             tab.Controls.Add(btnExpandAll);
 
             var btnCollapseAll = new Button
@@ -173,7 +177,7 @@ namespace EndfieldCalculator
             targetSection.AddControl(chkIsTrueDamage);
             innerY += 35;
 
-            // Add Staggered checkbox here
+           
             chkStaggered = new CheckBox
             {
                 Text = "Target is Staggered (×1.3 DMG)",
@@ -501,93 +505,115 @@ namespace EndfieldCalculator
             return panel;
         }
 
+        private object RunDamageCalculation(double? overrideDamageMultiplierPercent = null, bool updateUI = true)
+        {
+            var gearBonuses = CalculateGearBonuses();
+
+            double staggeredDamageBonus = (double)nudStaggeredBonus.Value;
+            bool isStaggered = chkStaggered.Checked;
+
+            double dmgMult = overrideDamageMultiplierPercent ?? (double)nudDamageMultiplier.Value;
+
+            var result = DamageCalculator.Calculate(
+                (double)nudBaseAttack.Value,
+                (double)nudWeaponAttack.Value,
+                (double)nudAttackPercent.Value + gearBonuses.AttackPercent,
+                (double)nudAttackFlat.Value + gearBonuses.AttackFlat,
+                (double)nudPrimaryStat.Value,
+                (double)nudSecondaryStat.Value,
+                dmgMult,
+                (double)nudCritRate.Value + gearBonuses.CritRate,
+                (double)nudCritDamage.Value + gearBonuses.CritDamage,
+                (double)nudLevel.Value,
+                (double)nudSourceStoneArtistry.Value,
+                (double)nudElementalBonus.Value + gearBonuses.ElementalDamageBonus,
+                (double)nudSkillBonus.Value + gearBonuses.SkillDamageBonus + gearBonuses.AllDamageBonus,
+                staggeredDamageBonus,
+                (double)nudOtherBonus.Value,
+                (double)nudTargetDefense.Value,
+                (double)nudTargetResistance.Value,
+                isStaggered,
+                chkIsTrueDamage.Checked,
+                cmbAnomalyType.SelectedItem?.ToString() ?? "None",
+                (int)nudAnomalyLevel.Value,
+                (double)nudVulnerability.Value,
+                (double)nudAmplification.Value,
+                (double)nudSanctuary.Value,
+                (double)nudFragility.Value,
+                (double)nudDamageReduction.Value + gearBonuses.DamageReduction,
+                (double)nudSpecialMultiplier.Value,
+                chkIsCritical.Checked
+            );
+
+            if (updateUI)
+                ApplyDamageResultToUI(result, gearBonuses, isStaggered, staggeredDamageBonus);
+
+            return result;
+        }
+
+        private void ApplyDamageResultToUI(dynamic result, dynamic gearBonuses, bool isStaggered, double staggeredDamageBonus)
+        {
+            txtFinalAttack.Text = result.FinalAttack.ToString("F2");
+            txtBaseDamage.Text = result.BaseDamage.ToString("F2");
+            txtFinalDamage.Text = result.FinalDamage.ToString("F2") +
+                                  (chkIsCritical.Checked ? " (CRIT!)" : "");
+
+            if (txtMinDamage != null) txtMinDamage.Text = result.MinDamage.ToString("F2");
+            if (txtMaxDamage != null) txtMaxDamage.Text = result.MaxDamage.ToString("F2");
+            if (txtAvgDamage != null) txtAvgDamage.Text = result.AverageDamage.ToString("F2");
+            if (txtCritChance != null) txtCritChance.Text = $"{nudCritRate.Value + (decimal)gearBonuses.CritRate:F2}%";
+
+            string gearInfo = "";
+            if (gearBonuses.AttackPercent > 0 || gearBonuses.AttackFlat > 0 ||
+                gearBonuses.ElementalDamageBonus > 0 || gearBonuses.SkillDamageBonus > 0)
+            {
+                gearInfo = "\nGear Bonuses Applied:\n";
+                if (gearBonuses.AttackFlat > 0) gearInfo += $"  +{gearBonuses.AttackFlat:F2} Flat ATK\n";
+                if (gearBonuses.AttackPercent > 0) gearInfo += $"  +{gearBonuses.AttackPercent:F2}% ATK\n";
+                if (gearBonuses.CritRate > 0) gearInfo += $"  +{gearBonuses.CritRate:F2}% Crit Rate\n";
+                if (gearBonuses.CritDamage > 0) gearInfo += $"  +{gearBonuses.CritDamage:F2}% Crit Damage\n";
+                if (gearBonuses.ElementalDamageBonus > 0) gearInfo += $"  +{gearBonuses.ElementalDamageBonus:F2}% Elemental DMG\n";
+                if (gearBonuses.SkillDamageBonus > 0) gearInfo += $"  +{gearBonuses.SkillDamageBonus:F2}% Skill DMG\n";
+                if (gearBonuses.AllDamageBonus > 0) gearInfo += $"  +{gearBonuses.AllDamageBonus:F2}% All DMG\n";
+                if (gearBonuses.DamageReduction > 0) gearInfo += $"  +{gearBonuses.DamageReduction:F2}% DMG Reduction\n";
+            }
+
+            string statInfo = $"\nStat Configuration:\n" +
+                              $"  Primary: {nudPrimaryStat.Value:F2} ({cmbPrimaryStatType.SelectedItem})\n" +
+                              $"  Secondary: {nudSecondaryStat.Value:F2} ({cmbSecondaryStatType.SelectedItem})\n";
+
+            string staggeredInfo = "";
+            if (isStaggered || staggeredDamageBonus > 0)
+            {
+                staggeredInfo = $"\nStaggered Effects:\n";
+                if (isStaggered)
+                    staggeredInfo += $"  ✓ Target is Staggered: ×1.3 Global Multiplier\n";
+                if (staggeredDamageBonus > 0)
+                    staggeredInfo += $"  ✓ Staggered Damage Bonus: +{staggeredDamageBonus:F2}% (added to Damage Bonus Zone)\n";
+            }
+
+            txtBreakdown.Text = statInfo + gearInfo + staggeredInfo + "\n" + result.Breakdown;
+        }
+
+
         private void BtnCalculate_Click(object sender, EventArgs e)
         {
             try
             {
-                var gearBonuses = CalculateGearBonuses();
+                var ctx = ComputeDamageContextFromUi();
+                ApplyDamageResultToUi(ctx.ResultCurrent);
 
+                var effects = new List<IEffect>(); // later: selected operator potentials/talents/gear effects
 
-                double staggeredDamageBonus = (double)nudStaggeredBonus.Value;
+                var basicHeat = new HitContext(DamageType.Heat, DamageScope.BasicAttack);
+                var skillHeat = new HitContext(DamageType.Heat, DamageScope.BattleSkill);
 
+                var b1 = _baselineService.GetBaseline100(basicHeat, effects);
+                var b2 = _baselineService.GetBaseline100(skillHeat, effects);
 
-                bool isStaggered = chkStaggered.Checked;
+                System.Diagnostics.Debug.WriteLine($"Baseline Heat Basic: Raw100={b1.Raw100:F2}, Final100={b1.Final100:F2}");
+                System.Diagnostics.Debug.WriteLine($"Baseline Heat Skill: Raw100={b2.Raw100:F2}, Final100={b2.Final100:F2}");
 
-                var result = DamageCalculator.Calculate(
-                    (double)nudBaseAttack.Value,
-                    (double)nudWeaponAttack.Value,
-                    (double)nudAttackPercent.Value + gearBonuses.AttackPercent,
-                    (double)nudAttackFlat.Value + gearBonuses.AttackFlat,
-                    (double)nudPrimaryStat.Value,
-                    (double)nudSecondaryStat.Value,
-                    (double)nudDamageMultiplier.Value,
-                    (double)nudCritRate.Value + gearBonuses.CritRate,
-                    (double)nudCritDamage.Value + gearBonuses.CritDamage,
-                    (double)nudLevel.Value,
-                    (double)nudSourceStoneArtistry.Value,
-                    (double)nudElementalBonus.Value + gearBonuses.ElementalDamageBonus,
-                    (double)nudSkillBonus.Value + gearBonuses.SkillDamageBonus + gearBonuses.AllDamageBonus,
-                    staggeredDamageBonus, 
-                    (double)nudOtherBonus.Value,
-                    (double)nudTargetDefense.Value,
-                    (double)nudTargetResistance.Value,
-                    isStaggered, // Staggered status effect (×1.3 global multiplier)
-                    chkIsTrueDamage.Checked,
-                    cmbAnomalyType.SelectedItem?.ToString() ?? "None",
-                    (int)nudAnomalyLevel.Value,
-                    (double)nudVulnerability.Value,
-                    (double)nudAmplification.Value,
-                    (double)nudSanctuary.Value,
-                    (double)nudFragility.Value,
-                    (double)nudDamageReduction.Value + gearBonuses.DamageReduction,
-                    (double)nudSpecialMultiplier.Value,
-                    chkIsCritical.Checked
-                );
-
-                // Display results with 2 decimal places
-                txtFinalAttack.Text = result.FinalAttack.ToString("F2");
-                txtBaseDamage.Text = result.BaseDamage.ToString("F2");
-                txtFinalDamage.Text = result.FinalDamage.ToString("F2") +
-                                     (chkIsCritical.Checked ? " (CRIT!)" : "");
-
-                if (txtMinDamage != null) txtMinDamage.Text = result.MinDamage.ToString("F2");
-                if (txtMaxDamage != null) txtMaxDamage.Text = result.MaxDamage.ToString("F2");
-                if (txtAvgDamage != null) txtAvgDamage.Text = result.AverageDamage.ToString("F2");
-                if (txtCritChance != null) txtCritChance.Text = $"{nudCritRate.Value + (decimal)gearBonuses.CritRate:F2}%";
-
-                // Breakdown with stat type info
-                string gearInfo = "";
-                if (gearBonuses.AttackPercent > 0 || gearBonuses.AttackFlat > 0 ||
-                    gearBonuses.ElementalDamageBonus > 0 || gearBonuses.SkillDamageBonus > 0)
-                {
-                    gearInfo = "\nGear Bonuses Applied:\n";
-                    if (gearBonuses.AttackFlat > 0) gearInfo += $"  +{gearBonuses.AttackFlat:F2} Flat ATK\n";
-                    if (gearBonuses.AttackPercent > 0) gearInfo += $"  +{gearBonuses.AttackPercent:F2}% ATK\n";
-                    if (gearBonuses.CritRate > 0) gearInfo += $"  +{gearBonuses.CritRate:F2}% Crit Rate\n";
-                    if (gearBonuses.CritDamage > 0) gearInfo += $"  +{gearBonuses.CritDamage:F2}% Crit Damage\n";
-                    if (gearBonuses.ElementalDamageBonus > 0) gearInfo += $"  +{gearBonuses.ElementalDamageBonus:F2}% Elemental DMG\n";
-                    if (gearBonuses.SkillDamageBonus > 0) gearInfo += $"  +{gearBonuses.SkillDamageBonus:F2}% Skill DMG\n";
-                    if (gearBonuses.AllDamageBonus > 0) gearInfo += $"  +{gearBonuses.AllDamageBonus:F2}% All DMG\n";
-                    if (gearBonuses.DamageReduction > 0) gearInfo += $"  +{gearBonuses.DamageReduction:F2}% DMG Reduction\n";
-                }
-
-                // Add stat type info
-                string statInfo = $"\nStat Configuration:\n";
-                statInfo += $"  Primary: {nudPrimaryStat.Value:F2} ({cmbPrimaryStatType.SelectedItem})\n";
-                statInfo += $"  Secondary: {nudSecondaryStat.Value:F2} ({cmbSecondaryStatType.SelectedItem})\n";
-
-                // Add staggered info with clear separation
-                string staggeredInfo = "";
-                if (isStaggered || staggeredDamageBonus > 0)
-                {
-                    staggeredInfo = $"\nStaggered Effects:\n";
-                    if (isStaggered)
-                        staggeredInfo += $"  ✓ Target is Staggered: ×1.3 Global Multiplier\n";
-                    if (staggeredDamageBonus > 0)
-                        staggeredInfo += $"  ✓ Staggered Damage Bonus: +{staggeredDamageBonus:F2}% (added to Damage Bonus Zone)\n";
-                }
-
-                txtBreakdown.Text = statInfo + gearInfo + staggeredInfo + "\n" + result.Breakdown;
             }
             catch (Exception ex)
             {
@@ -595,5 +621,48 @@ namespace EndfieldCalculator
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        public EndfieldCalculator.DamageCalculator.DamageResult CalculateBaseline100WithOverrides(
+              double elementalBonusOverride,
+              double skillBonusOverride,
+              double otherBonusOverride)
+        {
+            var gearBonuses = CalculateGearBonuses();
+
+            double staggeredDamageBonus = (double)nudStaggeredBonus.Value;
+            bool isStaggered = chkStaggered.Checked;
+
+            return DamageCalculator.Calculate(
+                (double)nudBaseAttack.Value,
+                (double)nudWeaponAttack.Value,
+                (double)nudAttackPercent.Value + gearBonuses.AttackPercent,
+                (double)nudAttackFlat.Value + gearBonuses.AttackFlat,
+                (double)nudPrimaryStat.Value,
+                (double)nudSecondaryStat.Value,
+                100, // <-- baseline
+                (double)nudCritRate.Value + gearBonuses.CritRate,
+                (double)nudCritDamage.Value + gearBonuses.CritDamage,
+                (double)nudLevel.Value,
+                (double)nudSourceStoneArtistry.Value,
+                elementalBonusOverride,
+                skillBonusOverride,
+                staggeredDamageBonus,
+                otherBonusOverride,
+                (double)nudTargetDefense.Value,
+                (double)nudTargetResistance.Value,
+                isStaggered,
+                chkIsTrueDamage.Checked,
+                cmbAnomalyType.SelectedItem?.ToString() ?? "None",
+                (int)nudAnomalyLevel.Value,
+                (double)nudVulnerability.Value,
+                (double)nudAmplification.Value,
+                (double)nudSanctuary.Value,
+                (double)nudFragility.Value,
+                (double)nudDamageReduction.Value + gearBonuses.DamageReduction,
+                (double)nudSpecialMultiplier.Value,
+                chkIsCritical.Checked
+            );
+        }
+
     }
 }
