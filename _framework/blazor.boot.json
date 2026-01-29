@@ -1,10 +1,10 @@
 {
   "mainAssemblyName": "AKEndfieldDmgCalc.Web",
   "resources": {
-    "hash": "sha256-A1lEiiwXscSk5dTTBKX4reHqhYZObzEEAngS/7ptIdc=",
+    "hash": "sha256-CRfFOuXTQeFQWDb7hchfhDcg9cwSws3+FflEyddzauU=",
     "fingerprinting": {
-      "AKEndfieldDmgCalc.Core.n1b9ke0neu.wasm": "AKEndfieldDmgCalc.Core.wasm",
-      "AKEndfieldDmgCalc.Web.sss53rd2t0.wasm": "AKEndfieldDmgCalc.Web.wasm",
+      "AKEndfieldDmgCalc.Core.dfobzj8bau.wasm": "AKEndfieldDmgCalc.Core.wasm",
+      "AKEndfieldDmgCalc.Web.a7ppvgdg6h.wasm": "AKEndfieldDmgCalc.Web.wasm",
       "Microsoft.AspNetCore.Components.Forms.rhdb1nkdse.wasm": "Microsoft.AspNetCore.Components.Forms.wasm",
       "Microsoft.AspNetCore.Components.d4evja2d18.wasm": "Microsoft.AspNetCore.Components.wasm",
       "Microsoft.AspNetCore.Components.Web.lz3d5zag7x.wasm": "Microsoft.AspNetCore.Components.Web.wasm",
@@ -72,8 +72,8 @@
       "System.Runtime.InteropServices.JavaScript.8z290vppku.wasm": "sha256-rNzWhBOFDey9RsCv9RYwXjilGSxT7OPih9Pom7VnobY="
     },
     "assembly": {
-      "AKEndfieldDmgCalc.Core.n1b9ke0neu.wasm": "sha256-K+zJwWY8LVkdac0+23tfqGV3H6CYH5LI+7hqrWtVGDo=",
-      "AKEndfieldDmgCalc.Web.sss53rd2t0.wasm": "sha256-DKBdQLzmO/BlIzWZ/N9lmP8eP8dXU2mjuExUTNowMQc=",
+      "AKEndfieldDmgCalc.Core.dfobzj8bau.wasm": "sha256-l0AV9pEfAPKEwMCLmobObiUqgzUeNewzEKdROI/1txg=",
+      "AKEndfieldDmgCalc.Web.a7ppvgdg6h.wasm": "sha256-KiWnu4Ut3w6dapENPsHtSeENVETuQhlGJoQAYhvF40k=",
       "Microsoft.AspNetCore.Components.Forms.rhdb1nkdse.wasm": "sha256-8QmPtPRs9yLBPNjqGk78ZGq1YdDUexvtL6NHzalRmRE=",
       "Microsoft.AspNetCore.Components.d4evja2d18.wasm": "sha256-w+s/OyaZE+KSbW+zJ7bV8nFZuRlw7Hw0Pk3FE8mePaA=",
       "Microsoft.AspNetCore.Components.Web.lz3d5zag7x.wasm": "sha256-j3mMYzuvIie1plttaGdfisCZhToFVaRAOyYkj87yUrU=",
